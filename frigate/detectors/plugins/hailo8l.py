@@ -51,6 +51,8 @@ H8_DEFAULT_MODEL = "yolov6n.hef"
 H8L_DEFAULT_MODEL = "yolov6n.hef"
 H8_DEFAULT_URL = "https://hailo-model-zoo.s3.eu-west-2.amazonaws.com/ModelZoo/Compiled/v2.14.0/hailo8/yolov6n.hef"
 H8L_DEFAULT_URL = "https://hailo-model-zoo.s3.eu-west-2.amazonaws.com/ModelZoo/Compiled/v2.14.0/hailo8l/yolov6n.hef"
+H10_DEFAULT_MODEL = "yolov6n.hef"
+H10_DEFAULT_URL = "https://hailo-model-zoo.s3.eu-west-2.amazonaws.com/ModelZoo/Compiled/v5.4.0/hailo10h/yolov6n.hef"
 
 
 def detect_hailo_arch():
@@ -67,6 +69,9 @@ def detect_hailo_arch():
                     return "hailo8l"
                 elif "HAILO8" in line:
                     return "hailo8"
+                elif "HAILO10H" in line or "HAILO10" in line:
+                    # requires HailoRT 5.x runtime/driver (hailo1x_pci)
+                    return "hailo10h"
         logger.error("Inference error: Could not determine Hailo architecture.")
         return None
     except Exception as e:
@@ -292,6 +297,8 @@ class HailoDetector(DetectionApi):
         else:
             if ARCH == "hailo8":
                 return H8_DEFAULT_MODEL
+            elif ARCH == "hailo10h":
+                return H10_DEFAULT_MODEL
             else:
                 return H8L_DEFAULT_MODEL
 
@@ -318,6 +325,8 @@ class HailoDetector(DetectionApi):
                 logger.debug(f"Downloading default model: {model_name}")
                 if ARCH == "hailo8":
                     self.download_model(H8_DEFAULT_URL, cached_model_path)
+                elif ARCH == "hailo10h":
+                    self.download_model(H10_DEFAULT_URL, cached_model_path)
                 else:
                     self.download_model(H8L_DEFAULT_URL, cached_model_path)
         elif self.url:
@@ -409,10 +418,10 @@ class HailoDetector(DetectionApi):
 
 # ----------------- HailoDetectorConfig Class ----------------- #
 class HailoDetectorConfig(BaseDetectorConfig):
-    """Hailo-8/Hailo-8L detector using HEF models and the HailoRT SDK for inference on Hailo hardware."""
+    """Hailo-8/Hailo-8L/Hailo-10H detector using HEF models and the HailoRT SDK for inference on Hailo hardware."""
 
     model_config = ConfigDict(
-        title="Hailo-8/Hailo-8L",
+        title="Hailo-8/Hailo-8L/Hailo-10H",
     )
 
     type: Literal[DETECTOR_KEY]
