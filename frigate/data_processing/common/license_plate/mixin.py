@@ -59,11 +59,15 @@ class LicensePlateProcessingMixin:
         self.plates_det_second = EventsPerSecond()
         self.plates_det_second.start()
         self.event_metadata_publisher = EventMetadataPublisher()
-        self.ctc_decoder = CTCDecoder(
-            character_dict_path=os.path.join(
+        if self.lpr_config.device == "Hailo":
+            from frigate.detectors.hailo_ocr_runner import PADDLE_OCR_DICT
+
+            character_dict_path = PADDLE_OCR_DICT
+        else:
+            character_dict_path = os.path.join(
                 MODEL_CACHE_DIR, "paddleocr-onnx", "ppocr_keys_v1.txt"
             )
-        )
+        self.ctc_decoder = CTCDecoder(character_dict_path=character_dict_path)
         # process plates that are stationary and have no position changes for 5 seconds
         self.stationary_scan_duration = 5
 
@@ -1705,8 +1709,10 @@ class CTCDecoder:
         self.characters = []
         if character_dict_path and os.path.exists(character_dict_path):
             with open(character_dict_path, encoding="utf-8") as f:
+                # keep whitespace-only entries (e.g. U+3000 in the PP-OCRv5
+                # dict) — dropping them shifts every following class index
                 self.characters = (
-                    ["blank"] + [line.strip() for line in f if line.strip()] + [" "]
+                    ["blank"] + [line.rstrip("\r\n") for line in f] + [" "]
                 )
         else:
             self.characters = [

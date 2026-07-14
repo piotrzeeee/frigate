@@ -201,6 +201,12 @@ class PaddleOCRRecognition(BaseEmbedding):
             if self.downloader:
                 self.downloader.wait_for_download()
 
+            if self.device == "Hailo":
+                from frigate.detectors.hailo_ocr_runner import HailoOCRRunner
+
+                self.runner = HailoOCRRunner()
+                return
+
             self.runner = get_optimized_runner(
                 os.path.join(self.download_path, self.model_file),
                 self.device,
