@@ -1,6 +1,27 @@
 # Frigate na Raspberry Pi 5 + Hailo-10H (AI HAT+ 2) — setup
 
-Stan na 2026-07-14. Frigate oficjalnie NIE wspiera Hailo-10H (najwcześniej 0.19,
+## ✅ WDROŻONE 2026-07-14 na rpi5AI (192.168.10.251)
+
+Działająca konfiguracja (przetestowana — yolov8m, inference ~27 ms):
+
+- Host: Debian 13, kernel 6.12, `hailo-h10-all` **5.1.1** z apt RPi (bez zmian — sentinel od niego zależy).
+- Kontener: `~/hailo-frigate` (overlay msorenss), Frigate 0.18.0-beta1 + HailoRT **5.1.1**
+  (deb+wheel cp311 z Hailo Dev Zone, w `services/frigate-h10/packages/`) — wersja w kontenerze
+  MUSI się zgadzać z driverem hosta.
+- Urządzenie: `/dev/hailo0` (nie `/dev/h1x-0` — ta nazwa jest z nowszych driverów).
+- Model: lokalny `/models/yolov8m_h10.hef` (z `/usr/share/hailo-models/`, ten sam którego używa
+  sentinel) zamiast ściągania z Model Zoo — HEF-y z DFC 5.4.0 mogą nie ruszyć na runtime 5.1.1.
+- Porty przemapowane w `.env`, bo go2rtc sentinela zajmuje 1984/8555: Frigate go2rtc API → **1985**,
+  WebRTC → **8556**. UI: `http://192.168.10.251:5000`, auth: `https://192.168.10.251:8971`.
+- Kamera: TP-Link Tapo `tca72` (192.168.10.245) — detect na `stream2` (640×360@15), record na
+  `stream1` (2560×1440@15). LPR włączone.
+- **Sentinel**: zatrzymany na czas testów (`sudo systemctl start sentinel` przywraca; nadal
+  enabled — po reboocie wstanie razem z Frigate i mogą się pobić o Hailo). Backup:
+  `~/backup-sentinel-20260714.tgz` na Pi + kopia na Macu (`~/Desktop`).
+
+---
+
+Reszta dokumentu: ogólny przewodnik. Stan researchu na 2026-07-14. Frigate oficjalnie NIE wspiera Hailo-10H (najwcześniej 0.19,
 [dyskusja #21667](https://github.com/blakeblackshear/frigate/discussions/21667)).
 Ten przewodnik używa community-overlay [msorenss/hailo-frigate-standalone](https://github.com/msorenss/hailo-frigate-standalone)
 (Frigate 0.18.0-beta1 + HailoRT 5.3.0). Pełny research: `.remember/research/hailo10h-frigate.md`.
