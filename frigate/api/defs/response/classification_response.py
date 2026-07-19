@@ -21,6 +21,30 @@ class FacesResponse(RootModel[dict[str, list[str]]]):
     )
 
 
+class KnownPlateEntry(BaseModel):
+    """A single known license plate entry."""
+
+    plate: str = Field(description="License plate string")
+    label: str | None = Field(
+        default=None, description="Display label for the plate (e.g. owner name)"
+    )
+    expires_at: str | None = Field(
+        default=None,
+        description="ISO 8601 datetime after which the plate is automatically removed",
+    )
+    created_at: str | None = Field(
+        default=None, description="ISO 8601 datetime the entry was created"
+    )
+
+
+class KnownPlatesResponse(RootModel[list[KnownPlateEntry]]):
+    """Response model for the known plates list endpoint."""
+
+    root: list[KnownPlateEntry] = Field(
+        default_factory=list, description="List of known license plate entries"
+    )
+
+
 class FaceRecognitionResponse(BaseModel):
     """Response model for face recognition endpoint.
 

@@ -177,3 +177,10 @@ class Trigger(Model):
 
     class Meta:
         primary_key = CompositeKey("camera", "name")
+
+
+class KnownPlate(Model):
+    plate = CharField(null=False, primary_key=True, max_length=20)
+    label = CharField(null=True)
+    expires_at = DateTimeField(null=True)
+    created_at = DateTimeField(null=True)

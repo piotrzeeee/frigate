@@ -27,3 +27,14 @@ class GenerateObjectExamplesBody(BaseModel):
     label: str = Field(
         description="Object label to collect examples for (e.g., 'person', 'car')"
     )
+
+
+class KnownPlateBody(BaseModel):
+    plate: str = Field(description="License plate string", min_length=2, max_length=20)
+    label: str | None = Field(
+        default=None, description="Display label for the plate (e.g. owner name)"
+    )
+    expires_at: str | None = Field(
+        default=None,
+        description="ISO 8601 datetime after which the plate is automatically removed",
+    )

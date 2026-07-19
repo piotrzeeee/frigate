@@ -66,7 +66,7 @@ from frigate.events.types import (
     RegenerateDescriptionEnum,
 )
 from frigate.genai import GenAIClientManager
-from frigate.models import Event, Recordings, ReviewSegment, Trigger
+from frigate.models import Event, KnownPlate, Recordings, ReviewSegment, Trigger
 from frigate.types import TrackedObjectUpdateTypesEnum
 from frigate.util.builtin import serialize
 from frigate.util.file import get_event_thumbnail_bytes
@@ -126,7 +126,7 @@ class EmbeddingMaintainer(threading.Thread):
             ),
             load_vec_extension=True,
         )
-        models = [Event, Recordings, ReviewSegment, Trigger]
+        models = [Event, KnownPlate, Recordings, ReviewSegment, Trigger]
         db.bind(models)
 
         self.genai_manager = GenAIClientManager(config)

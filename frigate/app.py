@@ -58,6 +58,7 @@ from frigate.log import _stop_logging
 from frigate.models import (
     Event,
     Export,
+    KnownPlate,
     Previews,
     Recordings,
     RecordingsToDelete,
@@ -275,6 +276,7 @@ class FrigateApp:
         models = [
             Event,
             Export,
+            KnownPlate,
             Previews,
             Recordings,
             RecordingsToDelete,

@@ -21,11 +21,14 @@ from frigate.api.defs.request.classification_body import (
     DeleteFaceImagesBody,
     GenerateObjectExamplesBody,
     GenerateStateExamplesBody,
+    KnownPlateBody,
     RenameFaceBody,
 )
 from frigate.api.defs.response.classification_response import (
     FaceRecognitionResponse,
     FacesResponse,
+    KnownPlateEntry,
+    KnownPlatesResponse,
 )
 from frigate.api.defs.response.generic_response import GenericResponse
 from frigate.api.defs.tags import Tags
@@ -34,7 +37,7 @@ from frigate.config.camera import DetectConfig
 from frigate.config.classification import ObjectClassificationType
 from frigate.const import CLIPS_DIR, FACE_DIR, MODEL_CACHE_DIR
 from frigate.embeddings import EmbeddingsContext
-from frigate.models import Event
+from frigate.models import Event, KnownPlate
 from frigate.util.classification import (
     collect_object_classification_examples,
     collect_state_classification_examples,
@@ -510,6 +513,116 @@ def reprocess_license_plate(request: Request, event_id: str):
 
     return JSONResponse(
         content=response,
+        status_code=200,
+    )
+
+
+def purge_expired_known_plates() -> None:
+    """Remove known plates whose expiration time has passed."""
+    KnownPlate.delete().where(
+        KnownPlate.expires_at.is_null(False),
+        KnownPlate.expires_at < datetime.datetime.now(),
+    ).execute()
+
+
+@router.get(
+    "/lpr/known_plates",
+    response_model=KnownPlatesResponse,
+    summary="Get all known license plates",
+    description="""Returns the list of known license plates with their labels and
+    optional expiration times. Expired entries are purged before the list is returned.""",
+)
+def get_known_plates():
+    purge_expired_known_plates()
+    return JSONResponse(
+        content=[
+            KnownPlateEntry(
+                plate=entry.plate,
+                label=entry.label,
+                expires_at=entry.expires_at.isoformat() if entry.expires_at else None,
+                created_at=entry.created_at.isoformat() if entry.created_at else None,
+            ).model_dump()
+            for entry in KnownPlate.select().order_by(KnownPlate.created_at.desc())
+        ],
+        status_code=200,
+    )
+
+
+@router.post(
+    "/lpr/known_plates",
+    response_model=GenericResponse,
+    dependencies=[Depends(require_role(["admin"]))],
+    summary="Create or update a known license plate",
+    description="""Creates or updates a known license plate entry. The plate string is
+    normalized to uppercase alphanumeric characters. An optional label (e.g. the owner's
+    name) is used as the event sub label on recognition, and an optional ISO 8601
+    expiration time removes the entry automatically (temporary access).""",
+)
+def set_known_plate(request: Request, body: KnownPlateBody):
+    if not request.app.frigate_config.lpr.enabled:
+        return JSONResponse(
+            content={
+                "success": False,
+                "message": "License plate recognition is not enabled.",
+            },
+            status_code=400,
+        )
+
+    plate = "".join(c for c in body.plate.upper() if c.isalnum())
+    if len(plate) < 2:
+        return JSONResponse(
+            content={"success": False, "message": "Invalid plate."},
+            status_code=400,
+        )
+
+    expires_at = None
+    if body.expires_at:
+        try:
+            expires_at = datetime.datetime.fromisoformat(body.expires_at)
+        except ValueError:
+            return JSONResponse(
+                content={"success": False, "message": "Invalid expiration datetime."},
+                status_code=400,
+            )
+
+    existing = KnownPlate.get_or_none(KnownPlate.plate == plate)
+    if existing:
+        existing.label = body.label
+        existing.expires_at = expires_at
+        existing.save()
+    else:
+        KnownPlate.create(
+            plate=plate,
+            label=body.label,
+            expires_at=expires_at,
+            created_at=datetime.datetime.now(),
+        )
+
+    return JSONResponse(
+        content={"success": True, "message": f"Known plate {plate} saved."},
+        status_code=200,
+    )
+
+
+@router.delete(
+    "/lpr/known_plates/{plate}",
+    response_model=GenericResponse,
+    dependencies=[Depends(require_role(["admin"]))],
+    summary="Delete a known license plate",
+    description="""Deletes a known license plate entry. Returns a success message or an
+    error if the plate does not exist.""",
+)
+def delete_known_plate(plate: str):
+    deleted = KnownPlate.delete().where(KnownPlate.plate == plate).execute()
+
+    if not deleted:
+        return JSONResponse(
+            content={"success": False, "message": f"Plate {plate} not found."},
+            status_code=404,
+        )
+
+    return JSONResponse(
+        content={"success": True, "message": f"Known plate {plate} deleted."},
         status_code=200,
     )
 

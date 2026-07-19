@@ -1,0 +1,62 @@
+{
+  "documentTitle": "Tablice rejestracyjne - Frigate",
+  "lprDisabled": "Rozpoznawanie tablic rejestracyjnych nie jest włączone w konfiguracji.",
+  "knownPlates": {
+    "title": "Znane tablice",
+    "empty": "Brak znanych tablic. Dodaj tablicę, aby oznaczać rozpoznane pojazdy i nadawać dostęp."
+  },
+  "recentRecognitions": {
+    "title": "Ostatnie rozpoznania",
+    "empty": "Nie rozpoznano jeszcze żadnych tablic rejestracyjnych.",
+    "unknown": "Nieznana"
+  },
+  "table": {
+    "plate": "Tablica",
+    "label": "Etykieta",
+    "expiresAt": "Wygasa",
+    "createdAt": "Dodano",
+    "never": "Nigdy",
+    "time": "Czas",
+    "camera": "Kamera",
+    "recognizedAs": "Rozpoznano jako"
+  },
+  "button": {
+    "addPlate": "Dodaj tablicę",
+    "editPlate": "Edytuj tablicę",
+    "deletePlate": "Usuń tablicę"
+  },
+  "addPlate": {
+    "title": "Dodaj znaną tablicę",
+    "desc": "Etykieta jest wyświetlana przy rozpoznanych zdarzeniach. Ustaw wygasanie, aby nadać dostęp tymczasowy.",
+    "plate": "Tablica rejestracyjna",
+    "platePlaceholder": "np. WA12345",
+    "label": "Etykieta",
+    "labelPlaceholder": "np. Jan Kowalski",
+    "expiry": "Wygasa",
+    "expiryNever": "Nigdy",
+    "expiryHours_one": "Za {{count}} godzinę",
+    "expiryHours_few": "Za {{count}} godziny",
+    "expiryHours_many": "Za {{count}} godzin",
+    "expiryDays_one": "Za {{count}} dzień",
+    "expiryDays_few": "Za {{count}} dni",
+    "expiryDays_many": "Za {{count}} dni",
+    "expiryCustom": "W konkretnym terminie…"
+  },
+  "editPlate": {
+    "title": "Edytuj znaną tablicę"
+  },
+  "deletePlate": {
+    "title": "Usuń znaną tablicę",
+    "desc": "Czy na pewno usunąć tablicę {{plate}}? Tej operacji nie można cofnąć."
+  },
+  "toast": {
+    "success": {
+      "savedPlate": "Zapisano tablicę {{plate}}.",
+      "deletedPlate": "Usunięto tablicę {{plate}}."
+    },
+    "error": {
+      "savePlateFailed": "Nie udało się zapisać tablicy: {{errorMessage}}",
+      "deletePlateFailed": "Nie udało się usunąć tablicy: {{errorMessage}}"
+    }
+  }
+}

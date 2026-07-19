@@ -19,6 +19,19 @@ Działająca konfiguracja (przetestowana — yolov8m, inference ~27 ms):
   enabled — po reboocie wstanie razem z Frigate i mogą się pobić o Hailo). Backup:
   `~/backup-sentinel-20260714.tgz` na Pi + kopia na Macu (`~/Desktop`).
 
+### Natywna biblioteka tablic (2026-07-19)
+
+Fork dodaje natywną stronę **Plate Library** w UI Frigate (`/plates`, ikona auta
+w pasku bocznym): lista znanych tablic z etykietą (imię i nazwisko) i opcjonalnym
+wygasaniem (dostęp czasowy, wpisy usuwają się same). Backend: tabela `knownplate`
+(migracja 036), API `GET/POST /api/lpr/known_plates`, `DELETE /api/lpr/known_plates/{plate}`;
+dopasowanie w LPR mixin ustawia `sub_label` eventu (baza ma pierwszeństwo przed
+`known_plates` z configu). Na Pi wdrożone przez bind-mounty w `~/hailo-frigate/patches/`
+(pliki backendu + `web-dist` z `npm run build`). `gatekeeper` to teraz tylko mostek
+GPIO: event z tablicą + sub_label → impuls na GPIO17 (port 8090: /api/status, /api/test).
+Uwaga: `docs/static/frigate-api.yaml` wymaga regeneracji (`python3 generate_api_auth_spec.py`)
+w pełnym środowisku dev — w kontenerze beta1 wynik byłby niekompletny.
+
 ---
 
 Reszta dokumentu: ogólny przewodnik. Stan researchu na 2026-07-14. Frigate oficjalnie NIE wspiera Hailo-10H (najwcześniej 0.19,

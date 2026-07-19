@@ -257,6 +257,7 @@
     "review": "Przegląd",
     "uiPlayground": "Plac testowy UI",
     "faceLibrary": "Biblioteka twarzy",
+    "plateLibrary": "Tablice rejestracyjne",
     "user": {
       "account": "Konto",
       "current": "Aktualny użytkownik: {{user}}",

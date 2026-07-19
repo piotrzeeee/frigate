@@ -1,0 +1,60 @@
+{
+  "documentTitle": "Plate Library - Frigate",
+  "lprDisabled": "License plate recognition is not enabled in the configuration.",
+  "knownPlates": {
+    "title": "Known Plates",
+    "empty": "No known plates yet. Add a plate to label recognized vehicles and grant access."
+  },
+  "recentRecognitions": {
+    "title": "Recent Recognitions",
+    "empty": "No license plates have been recognized yet.",
+    "unknown": "Unknown"
+  },
+  "table": {
+    "plate": "Plate",
+    "label": "Label",
+    "expiresAt": "Expires",
+    "createdAt": "Added",
+    "never": "Never",
+    "time": "Time",
+    "camera": "Camera",
+    "recognizedAs": "Recognized As"
+  },
+  "button": {
+    "addPlate": "Add Plate",
+    "editPlate": "Edit plate",
+    "deletePlate": "Delete plate"
+  },
+  "addPlate": {
+    "title": "Add Known Plate",
+    "desc": "The label is shown on recognized events. Set an expiration to grant temporary access.",
+    "plate": "License plate",
+    "platePlaceholder": "e.g. WA12345",
+    "label": "Label",
+    "labelPlaceholder": "e.g. John Smith",
+    "expiry": "Expires",
+    "expiryNever": "Never",
+    "expiryHours_one": "In {{count}} hour",
+    "expiryHours_other": "In {{count}} hours",
+    "expiryDays_one": "In {{count}} day",
+    "expiryDays_other": "In {{count}} days",
+    "expiryCustom": "At a specific date…"
+  },
+  "editPlate": {
+    "title": "Edit Known Plate"
+  },
+  "deletePlate": {
+    "title": "Delete Known Plate",
+    "desc": "Are you sure you want to delete the plate {{plate}}? This cannot be undone."
+  },
+  "toast": {
+    "success": {
+      "savedPlate": "Plate {{plate}} has been saved.",
+      "deletedPlate": "Plate {{plate}} has been deleted."
+    },
+    "error": {
+      "savePlateFailed": "Failed to save plate: {{errorMessage}}",
+      "deletePlateFailed": "Failed to delete plate: {{errorMessage}}"
+    }
+  }
+}

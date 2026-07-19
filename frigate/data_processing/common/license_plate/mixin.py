@@ -28,6 +28,7 @@ from frigate.config.classification import LicensePlateRecognitionConfig
 from frigate.const import CLIPS_DIR, MODEL_CACHE_DIR
 from frigate.data_processing.common.license_plate.model import LicensePlateModelRunner
 from frigate.embeddings.onnx.lpr_embedding import LPR_EMBEDDING_SIZE
+from frigate.models import KnownPlate
 from frigate.types import TrackedObjectUpdateTypesEnum
 from frigate.util.builtin import EventsPerSecond, InferenceSpeed
 from frigate.util.image import area
@@ -980,6 +981,37 @@ class LicensePlateProcessingMixin:
 
         return padded_image
 
+    def _match_db_known_plate(self, camera: str, plate: str) -> str | None:
+        """Match a recognized plate against database-managed known plates.
+
+        Expired entries are purged first. Matching uses exact comparison and
+        Levenshtein distance within the configured match_distance.
+
+        Args:
+            camera: Camera identifier, used for logging.
+            plate: The recognized plate string.
+
+        Returns:
+            The matched entry's label (or plate when no label is set), or None.
+        """
+        try:
+            KnownPlate.delete().where(
+                KnownPlate.expires_at.is_null(False),
+                KnownPlate.expires_at < datetime.datetime.now(),
+            ).execute()
+
+            for entry in KnownPlate.select():
+                if (
+                    entry.plate == plate
+                    or Levenshtein.distance(entry.plate, plate)
+                    <= self.lpr_config.match_distance
+                ):
+                    return entry.label or entry.plate
+        except Exception as e:
+            logger.warning(f"{camera}: Error matching known plates from database: {e}")
+
+        return None
+
     @staticmethod
     def _crop_license_plate(image: np.ndarray, points: np.ndarray) -> np.ndarray:
         """
@@ -1614,21 +1646,24 @@ class LicensePlateProcessingMixin:
 
         # Determine subLabel based on known plates, use regex matching
         # Default to the detected plate, use label name if there's a match
-        sub_label = None
+        # Database-managed known plates (with optional expiry) take precedence
+        # over the static known_plates config
+        sub_label = self._match_db_known_plate(camera, rep_plate)
         try:
-            sub_label = next(
-                (
-                    label
-                    for label, plates_list in self.lpr_config.known_plates.items()  # type: ignore[union-attr]
-                    if any(
-                        re.match(f"^{plate}$", rep_plate)
-                        or Levenshtein.distance(plate, rep_plate)
-                        <= self.lpr_config.match_distance
-                        for plate in plates_list
-                    )
-                ),
-                None,
-            )
+            if sub_label is None:
+                sub_label = next(
+                    (
+                        label
+                        for label, plates_list in self.lpr_config.known_plates.items()  # type: ignore[union-attr]
+                        if any(
+                            re.match(f"^{plate}$", rep_plate)
+                            or Levenshtein.distance(plate, rep_plate)
+                            <= self.lpr_config.match_distance
+                            for plate in plates_list
+                        )
+                    ),
+                    None,
+                )
         except re.error:
             logger.error(
                 f"{camera}: Invalid regex in known plates configuration: {self.lpr_config.known_plates}"
