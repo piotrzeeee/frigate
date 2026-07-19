@@ -119,12 +119,12 @@ def get_detector_temperature(
                 temp = read_temperature(os.path.join(base, apex_name, "temp"))
                 if temp is not None:
                     return temp
-    elif detector_type == "hailo8l":
+    elif detector_type in ("hailo8l", "hailo10h"):
         # Get temperatures for Hailo devices
         hailo_temps = get_hailo_temps()
         if hailo_temps:
             hailo_device_names = sorted(hailo_temps.keys())
-            index = detector_index_by_type.get("hailo8l", 0)
+            index = detector_index_by_type.get(detector_type, 0)
             if index < len(hailo_device_names):
                 device_name = hailo_device_names[index]
                 return hailo_temps[device_name]
@@ -495,6 +495,11 @@ def stats_snapshot(
         "storage": {},
         "last_updated": int(time.time()),
     }
+
+    # host CPU temperature (Linux thermal zone; absent on unsupported platforms)
+    cpu_temp = read_temperature("/sys/class/thermal/thermal_zone0/temp")
+    if cpu_temp is not None:
+        stats["service"]["cpu_temperature"] = round(cpu_temp, 1)
 
     for path in [RECORD_DIR, CLIPS_DIR, CACHE_DIR]:
         try:

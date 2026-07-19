@@ -43,7 +43,7 @@ export default function GeneralMetrics({
     [
       "stats/history",
       {
-        keys: "detectors.inference_speed,detectors.temperature,detectors.cpu,detectors.mem,gpu_usages,npu_usages,processes.cpu,processes.mem,service.last_updated",
+        keys: "detectors.inference_speed,detectors.temperature,detectors.cpu,detectors.mem,gpu_usages,npu_usages,processes.cpu,processes.mem,service.last_updated,service.cpu_temperature",
       },
     ],
     {
@@ -141,6 +141,30 @@ export default function GeneralMetrics({
       });
     });
     return Object.values(series);
+  }, [statsHistory]);
+
+  const cpuTempSeries = useMemo(() => {
+    if (!statsHistory) {
+      return undefined;
+    }
+
+    const series: { name: string; data: { x: number; y: number }[] } = {
+      name: "cpu",
+      data: [],
+    };
+
+    statsHistory.forEach((stats, statsIdx) => {
+      if (stats?.service?.cpu_temperature === undefined) {
+        return;
+      }
+
+      series.data.push({
+        x: statsIdx + 1,
+        y: Math.round(stats.service.cpu_temperature),
+      });
+    });
+
+    return series.data.length > 0 ? [series] : undefined;
   }, [statsHistory]);
 
   const detTempSeries = useMemo(() => {
@@ -713,6 +737,23 @@ export default function GeneralMetrics({
                     <ThresholdBarGraph
                       key={series.name}
                       graphId={`${series.name}-temp`}
+                      name={series.name}
+                      unit="°C"
+                      threshold={DetectorTempThreshold}
+                      updateTimes={updateTimes}
+                      data={[series]}
+                      isActive={isActive}
+                    />
+                  ))}
+                </div>
+              )}
+              {cpuTempSeries && (
+                <div className="rounded-lg bg-background_alt p-2.5 md:rounded-2xl">
+                  <div className="mb-5">{t("general.cpuTemperature")}</div>
+                  {cpuTempSeries.map((series) => (
+                    <ThresholdBarGraph
+                      key={series.name}
+                      graphId={`${series.name}-cpu-temp`}
                       name={series.name}
                       unit="°C"
                       threshold={DetectorTempThreshold}

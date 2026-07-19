@@ -90,6 +90,7 @@ export type ServiceStats = {
   uptime: number;
   latest_version: string;
   version: string;
+  cpu_temperature?: number;
 };
 
 export type StorageStats = {

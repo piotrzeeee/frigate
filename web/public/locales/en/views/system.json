@@ -65,6 +65,7 @@
   },
   "general": {
     "title": "General",
+    "cpuTemperature": "CPU Temperature",
     "detector": {
       "title": "Detectors",
       "inferenceSpeed": "Detector Inference Speed",

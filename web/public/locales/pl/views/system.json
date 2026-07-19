@@ -12,6 +12,7 @@
     }
   },
   "general": {
+    "cpuTemperature": "Temperatura CPU",
     "hardwareInfo": {
       "gpuInfo": {
         "vainfoOutput": {
