@@ -184,3 +184,16 @@ class KnownPlate(Model):
     label = CharField(null=True)
     expires_at = DateTimeField(null=True)
     created_at = DateTimeField(null=True)
+
+
+class AlarmState(Model):
+    id = IntegerField(null=False, primary_key=True)
+    armed = BooleanField(default=False)
+    updated_at = DateTimeField(null=True)
+
+
+class AlarmTrigger(Model):
+    review_id = CharField(null=False, primary_key=True, max_length=30)
+    camera = CharField(max_length=20)
+    ts = DateTimeField(null=True)
+    data = TextField(null=True)

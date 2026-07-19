@@ -1,0 +1,23 @@
+{
+  "documentTitle": "Alarm - Frigate",
+  "title": "Alarm",
+  "state": {
+    "armed": "Armed",
+    "armedDesc": "Review alerts will trigger the alarm.",
+    "disarmed": "Disarmed",
+    "disarmedDesc": "Alerts are recorded but do not trigger the alarm."
+  },
+  "triggers": {
+    "title": "Trigger History",
+    "time": "Time",
+    "camera": "Camera",
+    "objects": "Objects",
+    "zones": "Zones",
+    "empty": "No alarm triggers yet."
+  },
+  "toast": {
+    "armed": "Alarm has been armed.",
+    "disarmed": "Alarm has been disarmed.",
+    "error": "Failed to update alarm: {{errorMessage}}"
+  }
+}

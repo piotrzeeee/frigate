@@ -56,6 +56,8 @@ from frigate.jobs.export import reap_stale_exports
 from frigate.jobs.motion_search import stop_all_motion_search_jobs
 from frigate.log import _stop_logging
 from frigate.models import (
+    AlarmState,
+    AlarmTrigger,
     Event,
     Export,
     KnownPlate,
@@ -274,6 +276,8 @@ class FrigateApp:
             load_vec_extension=self.config.semantic_search.enabled,
         )
         models = [
+            AlarmState,
+            AlarmTrigger,
             Event,
             Export,
             KnownPlate,

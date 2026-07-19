@@ -37,7 +37,14 @@ from frigate.const import (
     UPDATE_REVIEW_DESCRIPTION,
     UPSERT_REVIEW_SEGMENT,
 )
-from frigate.models import Event, Previews, Recordings, ReviewSegment
+from frigate.models import (
+    AlarmState,
+    AlarmTrigger,
+    Event,
+    Previews,
+    Recordings,
+    ReviewSegment,
+)
 from frigate.ptz.onvif import OnvifCommandEnum, OnvifController
 from frigate.types import ModelStatusTypesEnum, TrackedObjectUpdateTypesEnum
 from frigate.util.object import get_camera_regions_grid
@@ -171,6 +178,18 @@ class Dispatcher:
                 conflict_target=[ReviewSegment.id],
                 update=payload,
             ).execute()
+
+            # record an alarm trigger for alert segments while the alarm is
+            # armed; the review_id primary key dedupes repeated upserts
+            if payload.get("severity") == "alert":
+                state = AlarmState.get_or_none(AlarmState.id == 0)
+                if state and state.armed:
+                    AlarmTrigger.insert(
+                        review_id=payload["id"],
+                        camera=payload.get("camera", ""),
+                        ts=datetime.datetime.now(),
+                        data=json.dumps(payload.get("data") or {}),
+                    ).on_conflict_ignore().execute()
 
         def handle_clear_ongoing_review_segments() -> None:
             ReviewSegment.update(end_time=datetime.datetime.now().timestamp()).where(

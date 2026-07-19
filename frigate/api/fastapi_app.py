@@ -14,6 +14,7 @@ from starlette_context.plugins import Plugin
 
 from frigate.api import app as main_app
 from frigate.api import (
+    alarm,
     auth,
     camera,
     chat,
@@ -134,6 +135,7 @@ def create_fastapi_app(
 
     # Routes
     # Order of include_router matters: https://fastapi.tiangolo.com/tutorial/path-params/#order-matters
+    app.include_router(alarm.router)
     app.include_router(auth.router)
     app.include_router(camera.router)
     app.include_router(chat.router)

@@ -1,0 +1,23 @@
+{
+  "documentTitle": "Alarm - Frigate",
+  "title": "Alarm",
+  "state": {
+    "armed": "Uzbrojony",
+    "armedDesc": "Alerty z przeglądu wyzwalają alarm.",
+    "disarmed": "Rozbrojony",
+    "disarmedDesc": "Alerty są rejestrowane, ale nie wyzwalają alarmu."
+  },
+  "triggers": {
+    "title": "Historia wyzwoleń",
+    "time": "Czas",
+    "camera": "Kamera",
+    "objects": "Obiekty",
+    "zones": "Strefy",
+    "empty": "Brak wyzwoleń alarmu."
+  },
+  "toast": {
+    "armed": "Alarm został uzbrojony.",
+    "disarmed": "Alarm został rozbrojony.",
+    "error": "Nie udało się zmienić stanu alarmu: {{errorMessage}}"
+  }
+}
