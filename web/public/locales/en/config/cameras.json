@@ -949,6 +949,30 @@
       "description": "List of object types (from labelmap) that can trigger this zone. Can be a string or a list of strings. If empty, all objects are considered."
     }
   },
+  "counting_lines": {
+    "label": "Counting lines",
+    "description": "Counting lines count objects that cross a virtual line, with a direction (in or out).",
+    "friendly_name": {
+      "label": "Counting line name",
+      "description": "A user-friendly name for the counting line, displayed in the Frigate UI. If not set, a formatted version of the line name will be used."
+    },
+    "enabled": {
+      "label": "Enabled",
+      "description": "Enable or disable this counting line. Disabled lines are ignored at runtime."
+    },
+    "coordinates": {
+      "label": "Coordinates",
+      "description": "Two points that define the counting line as relative (0-1) coordinates in the form x1,y1,x2,y2. Walking along the line from the first point to the second, objects passing from your left to your right are counted as in."
+    },
+    "objects": {
+      "label": "Counted objects",
+      "description": "List of object types (from labelmap) that are counted when crossing this line. If empty, all objects are counted."
+    },
+    "reverse": {
+      "label": "Reverse direction",
+      "description": "Swap the in and out directions of the line."
+    }
+  },
   "enabled_in_config": {
     "label": "Original camera state",
     "description": "Keep track of original state of camera."

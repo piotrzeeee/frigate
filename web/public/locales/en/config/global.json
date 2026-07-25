@@ -382,8 +382,8 @@
       }
     },
     "hailo8l": {
-      "label": "Hailo-8/Hailo-8L",
-      "description": "Hailo-8/Hailo-8L detector using HEF models and the HailoRT SDK for inference on Hailo hardware.",
+      "label": "Hailo-8/Hailo-8L/Hailo-10H",
+      "description": "Hailo-8/Hailo-8L/Hailo-10H detector using HEF models and the HailoRT SDK for inference on Hailo hardware.",
       "device": {
         "label": "Device Type",
         "description": "The device to use for Hailo inference (e.g. 'PCIe', 'M.2')."
