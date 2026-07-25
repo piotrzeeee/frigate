@@ -93,11 +93,24 @@ class TestHttpCounting(BaseTestHttp):
 
     def test_crossings_accessible_to_viewer(self):
         self._insert("in", 0)
-        with AuthTestClient(self.app) as client:
-            resp = client.get(
+        app_with_gate = self.create_app(enforce_default_admin=True)
+        app_with_gate.dependency_overrides[get_current_user] = lambda: {
+            "username": "viewer1",
+            "role": "viewer",
+        }
+        app_with_gate.dependency_overrides[get_allowed_cameras_for_filter] = lambda: [
+            "front_door"
+        ]
+        with AuthTestClient(app_with_gate) as client:
+            resp_counting = client.get(
                 "/counting/crossings",
                 headers={"remote-role": "viewer", "remote-user": "viewer1"},
             )
-        assert resp.status_code == 200
-        rows = resp.json()
+            resp_logs = client.get(
+                "/logs/frigate",
+                headers={"remote-role": "viewer", "remote-user": "viewer1"},
+            )
+        assert resp_counting.status_code == 200
+        rows = resp_counting.json()
         assert len(rows) == 1
+        assert resp_logs.status_code == 403
