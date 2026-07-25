@@ -10,6 +10,7 @@ class Tags(Enum):
     events = "Events"
     export = "Export"
     classification = "Classification"
+    counting = "Counting"
     logs = "Logs"
     media = "Media"
     motion_search = "Motion Search"

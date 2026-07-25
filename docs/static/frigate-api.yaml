@@ -1308,6 +1308,95 @@ paths:
       security:
         - frigateAdminAuth: []
       x-required-role: admin
+  /lpr/known_plates:
+    get:
+      tags:
+        - Classification
+      summary: Get all known license plates
+      description: |-
+        **Access:** Admin role required.
+
+        Returns the list of known license plates with their labels and
+            optional expiration times. Expired entries are purged before the list is returned.
+      operationId: get_known_plates_lpr_known_plates_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KnownPlatesResponse'
+      security:
+        - frigateAdminAuth: []
+      x-required-role: admin
+    post:
+      tags:
+        - Classification
+      summary: Create or update a known license plate
+      description: |-
+        **Access:** Admin role required.
+
+        Creates or updates a known license plate entry. The plate string is
+            normalized to uppercase alphanumeric characters. An optional label (e.g. the owner's
+            name) is used as the event sub label on recognition, and an optional ISO 8601
+            expiration time removes the entry automatically (temporary access).
+      operationId: set_known_plate_lpr_known_plates_post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/KnownPlateBody'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+        - frigateAdminAuth: []
+      x-required-role: admin
+  /lpr/known_plates/{plate}:
+    delete:
+      tags:
+        - Classification
+      summary: Delete a known license plate
+      description: |-
+        **Access:** Admin role required.
+
+        Deletes a known license plate entry. Returns a success message or an
+            error if the plate does not exist.
+      operationId: delete_known_plate_lpr_known_plates__plate__delete
+      parameters:
+        - name: plate
+          in: path
+          required: true
+          schema:
+            type: string
+            title: Plate
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+        - frigateAdminAuth: []
+      x-required-role: admin
   /reindex:
     put:
       tags:
@@ -8333,6 +8422,67 @@ components:
           title: Detail
       type: object
       title: HTTPValidationError
+    KnownPlateBody:
+      properties:
+        plate:
+          type: string
+          maxLength: 20
+          minLength: 2
+          title: Plate
+          description: License plate string
+        label:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Label
+          description: Display label for the plate (e.g. owner name)
+        expires_at:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Expires At
+          description: ISO 8601 datetime after which the plate is automatically 
+            removed
+      type: object
+      required:
+        - plate
+      title: KnownPlateBody
+    KnownPlateEntry:
+      properties:
+        plate:
+          type: string
+          title: Plate
+          description: License plate string
+        label:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Label
+          description: Display label for the plate (e.g. owner name)
+        expires_at:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Expires At
+          description: ISO 8601 datetime after which the plate is automatically 
+            removed
+        created_at:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Created At
+          description: ISO 8601 datetime the entry was created
+      type: object
+      required:
+        - plate
+      title: KnownPlateEntry
+      description: A single known license plate entry.
+    KnownPlatesResponse:
+      items:
+        $ref: '#/components/schemas/KnownPlateEntry'
+      type: array
+      title: KnownPlatesResponse
+      description: Response model for the known plates list endpoint.
     Last24HoursReview:
       properties:
         reviewed_alert:
