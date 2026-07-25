@@ -6,6 +6,11 @@ from copy import deepcopy
 from pydantic import ValidationError
 
 from frigate.config import FrigateConfig
+from frigate.track.tracked_object import (
+    check_line_crossing,
+    line_side,
+    segments_intersect,
+)
 
 
 class TestCountingLineConfig(unittest.TestCase):
@@ -63,22 +68,15 @@ class TestCountingLineConfig(unittest.TestCase):
         assert line.objects == ["person"]
 
 
-from frigate.track.tracked_object import (
-    check_line_crossing,
-    line_side,
-    segments_intersect,
-)
-
-
 class TestCrossingGeometry(unittest.TestCase):
     # vertical line from (100, 0) down to (100, 200)
     START = (100, 0)
     END = (100, 200)
 
     def test_line_side_signs(self):
-        # screen coords, y down: A->B points down, x > 100 is side > 0
-        assert line_side(self.START, self.END, (150, 100)) > 0
-        assert line_side(self.START, self.END, (50, 100)) < 0
+        # screen coords, y down: A->B points down, x < 100 is side > 0
+        assert line_side(self.START, self.END, (150, 100)) < 0
+        assert line_side(self.START, self.END, (50, 100)) > 0
         assert line_side(self.START, self.END, (100, 50)) == 0
 
     def test_segments_intersect(self):
@@ -94,11 +92,11 @@ class TestCrossingGeometry(unittest.TestCase):
         side = line_side(self.START, self.END, cur)
         assert (
             check_line_crossing(prev_side, side, prev, cur, self.START, self.END, False)
-            == "in"
+            == "out"
         )
         assert (
             check_line_crossing(side, prev_side, cur, prev, self.START, self.END, False)
-            == "out"
+            == "in"
         )
 
     def test_crossing_reversed(self):
@@ -107,7 +105,7 @@ class TestCrossingGeometry(unittest.TestCase):
         side = line_side(self.START, self.END, cur)
         assert (
             check_line_crossing(prev_side, side, prev, cur, self.START, self.END, True)
-            == "out"
+            == "in"
         )
 
     def test_no_crossing_same_side(self):

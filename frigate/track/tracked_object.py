@@ -626,7 +626,7 @@ def line_side(a: tuple[int, int], b: tuple[int, int], p: tuple[float, float]) ->
 
     Sign of the 2D cross product; 0 means P is exactly on the line.
     """
-    return (b[1] - a[1]) * (p[0] - a[0]) - (b[0] - a[0]) * (p[1] - a[1])
+    return (b[0] - a[0]) * (p[1] - a[1]) - (b[1] - a[1]) * (p[0] - a[0])
 
 
 def segments_intersect(
