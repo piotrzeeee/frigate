@@ -63,5 +63,66 @@ class TestCountingLineConfig(unittest.TestCase):
         assert line.objects == ["person"]
 
 
+from frigate.track.tracked_object import (
+    check_line_crossing,
+    line_side,
+    segments_intersect,
+)
+
+
+class TestCrossingGeometry(unittest.TestCase):
+    # vertical line from (100, 0) down to (100, 200)
+    START = (100, 0)
+    END = (100, 200)
+
+    def test_line_side_signs(self):
+        # screen coords, y down: A->B points down, x > 100 is side > 0
+        assert line_side(self.START, self.END, (150, 100)) > 0
+        assert line_side(self.START, self.END, (50, 100)) < 0
+        assert line_side(self.START, self.END, (100, 50)) == 0
+
+    def test_segments_intersect(self):
+        assert segments_intersect((50, 100), (150, 100), self.START, self.END)
+        # parallel, never touches
+        assert not segments_intersect((50, 10), (50, 190), self.START, self.END)
+        # crosses the infinite line but beyond the segment end
+        assert not segments_intersect((50, 300), (150, 300), self.START, self.END)
+
+    def test_crossing_direction(self):
+        prev, cur = (50, 100), (150, 100)
+        prev_side = line_side(self.START, self.END, prev)
+        side = line_side(self.START, self.END, cur)
+        assert (
+            check_line_crossing(prev_side, side, prev, cur, self.START, self.END, False)
+            == "in"
+        )
+        assert (
+            check_line_crossing(side, prev_side, cur, prev, self.START, self.END, False)
+            == "out"
+        )
+
+    def test_crossing_reversed(self):
+        prev, cur = (50, 100), (150, 100)
+        prev_side = line_side(self.START, self.END, prev)
+        side = line_side(self.START, self.END, cur)
+        assert (
+            check_line_crossing(prev_side, side, prev, cur, self.START, self.END, True)
+            == "out"
+        )
+
+    def test_no_crossing_same_side(self):
+        p1, p2 = (150, 100), (180, 120)
+        s1 = line_side(self.START, self.END, p1)
+        s2 = line_side(self.START, self.END, p2)
+        assert check_line_crossing(s1, s2, p1, p2, self.START, self.END, False) is None
+
+    def test_no_crossing_beyond_segment(self):
+        # sign flips but movement passes below the line's end point
+        p1, p2 = (50, 300), (150, 300)
+        s1 = line_side(self.START, self.END, p1)
+        s2 = line_side(self.START, self.END, p2)
+        assert check_line_crossing(s1, s2, p1, p2, self.START, self.END, False) is None
+
+
 if __name__ == "__main__":
     unittest.main()

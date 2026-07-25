@@ -62,6 +62,8 @@ class TrackedObject:
         self.current_zones: list[str] = []
         self.entered_zones: list[str] = []
         self.new_zone_entered: bool = False
+        self.line_sides: dict[str, float] = {}
+        self.pending_line_crossings: list[dict[str, Any]] = []
         self.attributes: dict[str, float] = defaultdict(float)
         self.false_positive = True
         self.has_clip = False
@@ -299,6 +301,52 @@ class TrackedObject:
 
         # update loitering status
         self.pending_loitering = in_loitering_zone
+
+        # check counting lines; self.obj_data still holds the previous
+        # frame here, so it provides the previous anchor position
+        if self.camera_config.counting_lines and not self.false_positive:
+            prev_anchor = (self.obj_data["centroid"][0], self.obj_data["box"][3])
+            for name, line in self.camera_config.counting_lines.items():
+                if not line.enabled:
+                    continue
+                if len(line.objects) > 0 and obj_data["label"] not in line.objects:
+                    continue
+
+                side = line_side(line.start, line.end, bottom_center)
+                prev_side = self.line_sides.get(name, 0)
+                direction = check_line_crossing(
+                    prev_side,
+                    side,
+                    prev_anchor,
+                    bottom_center,
+                    line.start,
+                    line.end,
+                    line.reverse,
+                )
+
+                if direction is not None:
+                    self.pending_line_crossings.append(
+                        {
+                            "camera": self.camera_config.name,
+                            "line": name,
+                            "label": obj_data["label"],
+                            "direction": direction,
+                            "timestamp": obj_data["frame_time"],
+                            "event_id": self.obj_data["id"],
+                        }
+                    )
+                    # a crossing must reach the update callback promptly
+                    significant_change = True
+                    logger.debug(
+                        "%s: object %s crossed line %s direction %s",
+                        self.camera_config.name,
+                        self.obj_data["id"],
+                        name,
+                        direction,
+                    )
+
+                if side != 0:
+                    self.line_sides[name] = side
 
         # maintain attributes
         for attr in obj_data["attributes"]:
@@ -571,6 +619,55 @@ def zone_filtered(obj: TrackedObject, object_config: dict[str, FilterConfig]) ->
             return True
 
     return False
+
+
+def line_side(a: tuple[int, int], b: tuple[int, int], p: tuple[float, float]) -> float:
+    """Return which side of the directed line A->B point P is on.
+
+    Sign of the 2D cross product; 0 means P is exactly on the line.
+    """
+    return (b[1] - a[1]) * (p[0] - a[0]) - (b[0] - a[0]) * (p[1] - a[1])
+
+
+def segments_intersect(
+    p1: tuple[float, float],
+    p2: tuple[float, float],
+    q1: tuple[int, int],
+    q2: tuple[int, int],
+) -> bool:
+    """Return True if segment p1-p2 strictly crosses segment q1-q2."""
+    d1 = line_side(q1, q2, p1)
+    d2 = line_side(q1, q2, p2)
+    d3 = line_side(p1, p2, q1)
+    d4 = line_side(p1, p2, q2)
+    return ((d1 > 0) != (d2 > 0)) and ((d3 > 0) != (d4 > 0))
+
+
+def check_line_crossing(
+    prev_side: float,
+    side: float,
+    prev_anchor: tuple[float, float],
+    anchor: tuple[float, float],
+    start: tuple[int, int],
+    end: tuple[int, int],
+    reverse: bool,
+) -> str | None:
+    """Return "in" or "out" if the anchor movement crossed the line, else None.
+
+    Walking along the line from start to end, an object passing from the
+    left to the right is "in" unless reverse is set.
+    """
+    if prev_side == 0 or side == 0:
+        return None
+    if (prev_side > 0) == (side > 0):
+        return None
+    if not segments_intersect(prev_anchor, anchor, start, end):
+        return None
+
+    direction = "in" if side > 0 else "out"
+    if reverse:
+        return "out" if direction == "in" else "in"
+    return direction
 
 
 class TrackedObjectAttribute:
