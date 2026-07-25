@@ -25,6 +25,7 @@ from ..classification import (
 )
 from .audio import AudioConfig
 from .birdseye import BirdseyeCameraConfig
+from .counting_line import CountingLineConfig
 from .detect import DetectConfig
 from .ffmpeg import CameraFfmpegConfig, CameraInput
 from .live import CameraLiveConfig
@@ -194,6 +195,11 @@ class CameraConfig(FrigateBaseModel):
         default_factory=dict,
         title="Zones",
         description="Zones allow you to define a specific area of the frame so you can determine whether or not an object is within a particular area.",
+    )
+    counting_lines: dict[str, CountingLineConfig] = Field(
+        default_factory=dict,
+        title="Counting lines",
+        description="Counting lines count objects that cross a virtual line, with a direction (in or out).",
     )
     enabled_in_config: bool | None = Field(
         default=None,

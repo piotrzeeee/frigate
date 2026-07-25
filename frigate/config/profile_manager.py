@@ -286,6 +286,10 @@ class ProfileManager:
                 cam_config.zones = merged_zones
                 changed.setdefault(cam_name, set()).add("zones")
 
+            # Regenerate counting line endpoints
+            for line in cam_config.counting_lines.values():
+                line.generate_line(cam_config.frame_shape)
+
             base = self._base_configs.get(cam_name, {})
 
             for section in PROFILE_SECTION_UPDATES:

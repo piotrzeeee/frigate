@@ -989,6 +989,10 @@ class FrigateConfig(FrigateBaseModel):
                 for zone in camera_config.zones.values():
                     zone.enabled_in_config = zone.enabled
 
+            # generate counting line endpoints
+            for line in camera_config.counting_lines.values():
+                line.generate_line(camera_config.frame_shape)
+
             # Set live view stream if none is set
             if not camera_config.live.streams:
                 camera_config.live.streams = {name: name}
