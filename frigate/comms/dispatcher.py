@@ -22,6 +22,7 @@ from frigate.config.profile_manager import ProfileManager
 from frigate.const import (
     CLEAR_ONGOING_REVIEW_SEGMENTS,
     EXPIRE_AUDIO_ACTIVITY,
+    INSERT_LINE_CROSSING,
     INSERT_MANY_RECORDINGS,
     INSERT_PREVIEW,
     NOTIFICATION_TEST,
@@ -41,6 +42,7 @@ from frigate.models import (
     AlarmState,
     AlarmTrigger,
     Event,
+    LineCrossing,
     Previews,
     Recordings,
     ReviewSegment,
@@ -190,6 +192,9 @@ class Dispatcher:
                         ts=datetime.datetime.now(),
                         data=json.dumps(payload.get("data") or {}),
                     ).on_conflict_ignore().execute()
+
+        def handle_insert_line_crossing() -> None:
+            LineCrossing.insert(payload).execute()
 
         def handle_clear_ongoing_review_segments() -> None:
             ReviewSegment.update(end_time=datetime.datetime.now().timestamp()).where(
@@ -348,6 +353,7 @@ class Dispatcher:
         # Dictionary mapping topic to handlers
         topic_handlers = {
             INSERT_MANY_RECORDINGS: handle_insert_many_recordings,
+            INSERT_LINE_CROSSING: handle_insert_line_crossing,
             REQUEST_REGION_GRID: handle_request_region_grid,
             INSERT_PREVIEW: handle_insert_preview,
             UPSERT_REVIEW_SEGMENT: handle_upsert_review_segment,

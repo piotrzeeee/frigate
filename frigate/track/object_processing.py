@@ -35,6 +35,7 @@ from frigate.config.camera.updater import (
 )
 from frigate.const import (
     FAST_QUEUE_TIMEOUT,
+    INSERT_LINE_CROSSING,
     UPDATE_CAMERA_ACTIVITY,
     UPSERT_REVIEW_SEGMENT,
 )
@@ -128,6 +129,11 @@ class TrackedObjectProcessor(threading.Thread):
             )
 
         def update(camera: str, obj: TrackedObject, frame_name: str) -> None:
+            if obj.pending_line_crossings:
+                for crossing in obj.pending_line_crossings:
+                    self.requestor.send_data(INSERT_LINE_CROSSING, crossing)
+                obj.pending_line_crossings = []
+
             obj.has_snapshot = self.should_save_snapshot(camera, obj)
             obj.has_clip = self.should_retain_recording(camera, obj)
             after = obj.to_dict()
@@ -152,6 +158,11 @@ class TrackedObjectProcessor(threading.Thread):
             self.ptz_autotracker_thread.ptz_autotracker.autotrack_object(camera, obj)
 
         def end(camera: str, obj: TrackedObject, frame_name: str) -> None:
+            if obj.pending_line_crossings:
+                for crossing in obj.pending_line_crossings:
+                    self.requestor.send_data(INSERT_LINE_CROSSING, crossing)
+                obj.pending_line_crossings = []
+
             # populate has_snapshot
             obj.has_snapshot = self.should_save_snapshot(camera, obj)
             obj.has_clip = self.should_retain_recording(camera, obj)

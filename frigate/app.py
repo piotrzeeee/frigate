@@ -61,6 +61,7 @@ from frigate.models import (
     Event,
     Export,
     KnownPlate,
+    LineCrossing,
     Previews,
     Recordings,
     RecordingsToDelete,
@@ -281,14 +282,15 @@ class FrigateApp:
             Event,
             Export,
             KnownPlate,
+            LineCrossing,
             Previews,
             Recordings,
             RecordingsToDelete,
             Regions,
             ReviewSegment,
             Timeline,
-            User,
             Trigger,
+            User,
         ]
         self.db.bind(models)
 

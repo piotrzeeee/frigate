@@ -1,4 +1,5 @@
 from peewee import (
+    AutoField,
     BlobField,
     BooleanField,
     CharField,
@@ -197,3 +198,13 @@ class AlarmTrigger(Model):
     camera = CharField(max_length=20)
     ts = DateTimeField(null=True)
     data = TextField(null=True)
+
+
+class LineCrossing(Model):
+    id = AutoField()
+    camera = CharField(index=True, max_length=20)
+    line = CharField(max_length=50)
+    label = CharField(max_length=20)
+    direction = CharField(max_length=3)
+    timestamp = DateTimeField(index=True)
+    event_id = CharField(null=True, max_length=30)
