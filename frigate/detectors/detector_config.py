@@ -129,7 +129,12 @@ class ModelConfig(BaseModel):
         super().__init__(**config)
 
         self._merged_labelmap = {
-            **load_labels(config.get("labelmap_path", "/labelmap.txt")),
+            **load_labels(
+                config.get(
+                    "labelmap_path",
+                    os.environ.get("LABELMAP_PATH", "/labelmap.txt"),
+                )
+            ),
             **config.get("labelmap", {}),
         }
         self._colormap = {}
