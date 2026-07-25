@@ -90,3 +90,14 @@ class TestHttpCounting(BaseTestHttp):
         assert len(rows) == 1
         assert rows[0]["count_in"] == 1
         assert rows[0]["count_out"] == 1
+
+    def test_crossings_accessible_to_viewer(self):
+        self._insert("in", 0)
+        with AuthTestClient(self.app) as client:
+            resp = client.get(
+                "/counting/crossings",
+                headers={"remote-role": "viewer", "remote-user": "viewer1"},
+            )
+        assert resp.status_code == 200
+        rows = resp.json()
+        assert len(rows) == 1

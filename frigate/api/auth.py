@@ -112,6 +112,7 @@ def require_admin_by_default():
         "/exports/",  # /exports/{export_id}
         "/jobs/export/",  # /jobs/export/{export_id}
         "/vod/",  # /vod/{camera_name}/...
+        "/counting/",  # /counting/crossings, /counting/summary (camera-scoped)
         "/notifications/",  # /notifications/pubkey, /notifications/register
     )
 

@@ -1959,6 +1959,159 @@ paths:
       security:
         - frigateAdminAuth: []
       x-required-role: admin
+  /counting/crossings:
+    get:
+      tags:
+        - Counting
+      summary: Get raw counting line crossings
+      description: |-
+        **Access:** Any authenticated user.
+
+        Returns individual line crossing events, newest first.
+      operationId: get_crossings_counting_crossings_get
+      parameters:
+        - name: cameras
+          in: query
+          required: false
+          schema:
+            type: string
+            default: all
+            title: Cameras
+        - name: lines
+          in: query
+          required: false
+          schema:
+            type: string
+            default: all
+            title: Lines
+        - name: labels
+          in: query
+          required: false
+          schema:
+            type: string
+            default: all
+            title: Labels
+        - name: after
+          in: query
+          required: false
+          schema:
+            type: number
+            title: After
+        - name: before
+          in: query
+          required: false
+          schema:
+            type: number
+            title: Before
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 100
+            title: Limit
+        - name: bucket
+          in: query
+          required: false
+          schema:
+            enum:
+              - hour
+              - day
+            type: string
+            default: hour
+            title: Bucket
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+        - frigateUserAuth: []
+      x-required-role: any
+  /counting/summary:
+    get:
+      tags:
+        - Counting
+      summary: Get aggregated counting line counts
+      description: |-
+        **Access:** Any authenticated user.
+
+        Returns in/out counts per camera and line, bucketed by hour
+            or day in server local time.
+      operationId: get_summary_counting_summary_get
+      parameters:
+        - name: cameras
+          in: query
+          required: false
+          schema:
+            type: string
+            default: all
+            title: Cameras
+        - name: lines
+          in: query
+          required: false
+          schema:
+            type: string
+            default: all
+            title: Lines
+        - name: labels
+          in: query
+          required: false
+          schema:
+            type: string
+            default: all
+            title: Labels
+        - name: after
+          in: query
+          required: false
+          schema:
+            type: number
+            title: After
+        - name: before
+          in: query
+          required: false
+          schema:
+            type: number
+            title: Before
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 100
+            title: Limit
+        - name: bucket
+          in: query
+          required: false
+          schema:
+            enum:
+              - hour
+              - day
+            type: string
+            default: hour
+            title: Bucket
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+        - frigateUserAuth: []
+      x-required-role: any
   /review:
     get:
       tags:
