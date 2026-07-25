@@ -1,7 +1,7 @@
 """Tests for the counting line APIs."""
 
 from frigate.api.auth import get_allowed_cameras_for_filter, get_current_user
-from frigate.models import LineCrossing
+from frigate.models import AlarmState, AlarmTrigger, LineCrossing
 from frigate.test.http_api.base_http_test import AuthTestClient, BaseTestHttp
 
 BASE_TS = 1750000000.0
@@ -9,7 +9,7 @@ BASE_TS = 1750000000.0
 
 class TestHttpCounting(BaseTestHttp):
     def setUp(self):
-        super().setUp([LineCrossing])
+        super().setUp([LineCrossing, AlarmState, AlarmTrigger])
         self.app = self.create_app()
         self.app.dependency_overrides[get_current_user] = lambda: {
             "username": "admin",
@@ -106,11 +106,11 @@ class TestHttpCounting(BaseTestHttp):
                 "/counting/crossings",
                 headers={"remote-role": "viewer", "remote-user": "viewer1"},
             )
-            resp_logs = client.get(
-                "/logs/frigate",
+            resp_alarm = client.get(
+                "/alarm",
                 headers={"remote-role": "viewer", "remote-user": "viewer1"},
             )
         assert resp_counting.status_code == 200
         rows = resp_counting.json()
         assert len(rows) == 1
-        assert resp_logs.status_code == 403
+        assert resp_alarm.status_code == 403
