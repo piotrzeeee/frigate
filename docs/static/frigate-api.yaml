@@ -5569,6 +5569,14 @@ paths:
               - type: integer
               - type: 'null'
             title: Zones
+        - name: counting_lines
+          in: query
+          required: false
+          schema:
+            anyOf:
+              - type: integer
+              - type: 'null'
+            title: Counting Lines
         - name: mask
           in: query
           required: false
@@ -5688,6 +5696,14 @@ paths:
               - type: integer
               - type: 'null'
             title: Zones
+        - name: counting_lines
+          in: query
+          required: false
+          schema:
+            anyOf:
+              - type: integer
+              - type: 'null'
+            title: Counting Lines
         - name: mask
           in: query
           required: false

@@ -1001,6 +1001,10 @@
       "score": "Score",
       "ratio": "Ratio",
       "area": "Area"
+    },
+    "countingLines": {
+      "title": "Counting Lines",
+      "desc": "Show counting lines with an arrow pointing toward the side counted as in"
     }
   },
   "timestampPosition": {

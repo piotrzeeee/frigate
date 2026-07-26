@@ -2,6 +2,7 @@
 
 import datetime
 import logging
+import math
 import os
 import threading
 from collections import defaultdict
@@ -235,6 +236,31 @@ class CameraState:
                     else 2
                 )
                 cv2.drawContours(frame_copy, [zone.contour], -1, zone.color, thickness)
+
+        if draw_options.get("counting_lines"):
+            for line in self.camera_config.counting_lines.values():
+                if not line.enabled:
+                    continue
+
+                start = line.start
+                end = line.end
+                # editor shows this color as RGB 0,180,220; frame is BGR
+                color = (220, 180, 0)
+                cv2.line(frame_copy, start, end, color, 2)
+
+                # arrow from the midpoint toward the side counted as in
+                dx = end[0] - start[0]
+                dy = end[1] - start[1]
+                length = math.hypot(dx, dy)
+
+                if length > 0:
+                    sign = -1 if line.reverse else 1
+                    mid = ((start[0] + end[0]) // 2, (start[1] + end[1]) // 2)
+                    tip = (
+                        int(mid[0] - sign * dy / length * 30),
+                        int(mid[1] + sign * dx / length * 30),
+                    )
+                    cv2.arrowedLine(frame_copy, mid, tip, color, 2, tipLength=0.4)
 
         if draw_options.get("motion_boxes"):
             for m_box in motion_boxes:

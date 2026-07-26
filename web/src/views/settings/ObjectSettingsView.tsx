@@ -81,6 +81,11 @@ export default function ObjectSettingsView({
       description: t("debug.zones.desc"),
     },
     {
+      param: "counting_lines",
+      title: t("debug.countingLines.title"),
+      description: t("debug.countingLines.desc"),
+    },
+    {
       param: "mask",
       title: t("debug.mask.title"),
       description: t("debug.mask.desc"),

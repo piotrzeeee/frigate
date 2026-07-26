@@ -19,6 +19,7 @@ class MediaLatestFrameQueryParams(BaseModel):
     bbox: int | None = None
     timestamp: int | None = None
     zones: int | None = None
+    counting_lines: int | None = None
     mask: int | None = None
     motion: int | None = None
     paths: int | None = None
@@ -43,6 +44,7 @@ class MediaMjpegFeedQueryParams(BaseModel):
     bbox: int | None = None
     timestamp: int | None = None
     zones: int | None = None
+    counting_lines: int | None = None
     mask: int | None = None
     motion: int | None = None
     regions: int | None = None
