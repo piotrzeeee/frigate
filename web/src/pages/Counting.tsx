@@ -12,6 +12,7 @@ import { useEffect, useMemo, useState } from "react";
 import Chart from "react-apexcharts";
 import { useTranslation } from "react-i18next";
 import { LuCalendar } from "react-icons/lu";
+import { MdCircle } from "react-icons/md";
 import useSWR from "swr";
 
 const COUNTING_COLORS = ["#5C7CFA", "#ED5CFA"];
@@ -182,8 +183,16 @@ export default function Counting() {
                 </div>
 
                 <div className="flex flex-wrap gap-6">
-                  <StatBlock label={t("in")} value={totalIn} />
-                  <StatBlock label={t("out")} value={totalOut} />
+                  <StatBlock
+                    label={t("in")}
+                    value={totalIn}
+                    color={COUNTING_COLORS[0]}
+                  />
+                  <StatBlock
+                    label={t("out")}
+                    value={totalOut}
+                    color={COUNTING_COLORS[1]}
+                  />
                   <StatBlock label={t("balance")} value={totalIn - totalOut} />
                 </div>
 
@@ -213,11 +222,15 @@ export default function Counting() {
 type StatBlockProps = {
   label: string;
   value: number;
+  color?: string;
 };
-function StatBlock({ label, value }: StatBlockProps) {
+function StatBlock({ label, value, color }: StatBlockProps) {
   return (
     <div className="flex flex-col">
-      <div className="text-xs text-secondary-foreground">{label}</div>
+      <div className="flex items-center gap-1 text-xs text-secondary-foreground">
+        {color && <MdCircle className="size-2" style={{ color }} />}
+        {label}
+      </div>
       <div className="text-lg font-medium text-primary">{value}</div>
     </div>
   );
