@@ -342,7 +342,8 @@
         "type": {
           "object_mask": "maska obiektowa",
           "motion_mask": "maska ruchu",
-          "zone": "strefa"
+          "zone": "strefa",
+          "counting_line": "linia zliczająca"
         }
       },
       "speed": {
@@ -470,7 +471,41 @@
     },
     "restart_required": "Wymagane ponowne uruchomienie (maski/strefy zmienione)",
     "motionMaskLabel": "Maska Ruchu {{number}}",
-    "objectMaskLabel": "Maska Obiektu {{number}}"
+    "objectMaskLabel": "Maska Obiektu {{number}}",
+    "countingLines": {
+      "label": "Linie zliczające",
+      "documentTitle": "Edycja linii zliczającej - Frigate",
+      "desc": {
+        "title": "Linie zliczające liczą obiekty, które je przekraczają, z kierunkiem wejścia i wyjścia."
+      },
+      "add": "Dodaj linię zliczającą",
+      "edit": "Edytuj linię zliczającą",
+      "defaultName": "Linia zliczająca {{number}}",
+      "point_one": "{{count}} punkt",
+      "point_few": "{{count}} punkty",
+      "point_many": "{{count}} punktów",
+      "point_other": "{{count}} punktu",
+      "clickDrawLine": "Kliknij, aby umieścić dwa końce linii zliczającej.",
+      "name": {
+        "title": "Nazwa",
+        "description": "Opcjonalna przyjazna nazwa tej linii zliczającej.",
+        "placeholder": "Wpisz nazwę..."
+      },
+      "reverse": "Odwróć kierunek",
+      "reverseDesc": "Zamienia strony liczone jako wejście i wyjście.",
+      "restartRequired": "Uruchom ponownie Frigate, aby zastosować zmiany linii zliczających.",
+      "toggleViaEdit": "Edytuj linię zliczającą, aby zmienić jej stan włączenia",
+      "form": {
+        "error": {
+          "mustHaveTwoPoints": "Linia zliczająca musi mieć dokładnie 2 punkty."
+        }
+      },
+      "toast": {
+        "success": {
+          "title": "Zapisano {{polygonName}}."
+        }
+      }
+    }
   },
   "debug": {
     "objectList": "Lista Obiektów",
@@ -530,6 +565,10 @@
       "title": "Ścieżki",
       "desc": "Pokaż punkty znaczące ścieżki dla śledzonego obiektu",
       "tips": "<p><strong>Ścieżki</strong></p><br><p>Linie i koła wskażą punkty znaczące po których poruszał się obiekt podczas śledzenia.</p>"
+    },
+    "countingLines": {
+      "title": "Linie zliczające",
+      "desc": "Pokazuje linie zliczające ze strzałką wskazującą stronę liczoną jako wejście"
     }
   },
   "motionDetectionTuner": {

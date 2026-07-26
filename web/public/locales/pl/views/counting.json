@@ -1,0 +1,11 @@
+{
+  "documentTitle": "Zliczanie - Frigate",
+  "title": "Zliczanie",
+  "in": "Wejścia",
+  "out": "Wyjścia",
+  "balance": "Bilans",
+  "selectDay": "Wybierz dzień",
+  "loadError": "Nie udało się załadować danych zliczania.",
+  "noLines": "Brak skonfigurowanych linii zliczających. Narysuj linie w Ustawieniach, w sekcji Maski / Strefy.",
+  "hourlyChart": "Przekroczenia na godzinę"
+}

@@ -280,7 +280,8 @@
     "profiles": "Profile",
     "actions": "Akcje",
     "features": "Funkcje",
-    "chat": "Czat"
+    "chat": "Czat",
+    "counting": "Zliczanie"
   },
   "role": {
     "viewer": "Przeglądający",
