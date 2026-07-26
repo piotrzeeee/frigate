@@ -10,5 +10,7 @@
   "hourlyChart": "Przekroczenia na godzinę",
   "recentCrossings": "Ostatnie przejścia",
   "noCrossings": "Brak przejść tego dnia.",
-  "openRecording": "Otwórz nagranie"
+  "openRecording": "Otwórz nagranie",
+  "directionIn": "Wejście",
+  "directionOut": "Wyjście"
 }

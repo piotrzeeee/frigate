@@ -294,8 +294,8 @@ export default function Counting() {
                             </span>
                             <span className="w-16 text-sm text-primary">
                               {crossing.direction == "in"
-                                ? t("in")
-                                : t("out")}
+                                ? t("directionIn")
+                                : t("directionOut")}
                             </span>
                             <span className="flex-1 text-sm text-muted-foreground">
                               {t(crossing.label, { ns: "objects" })}

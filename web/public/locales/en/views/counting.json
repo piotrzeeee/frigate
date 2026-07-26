@@ -10,5 +10,7 @@
   "hourlyChart": "Crossings per hour",
   "recentCrossings": "Recent crossings",
   "noCrossings": "No crossings on this day.",
-  "openRecording": "Open recording"
+  "openRecording": "Open recording",
+  "directionIn": "In",
+  "directionOut": "Out"
 }
