@@ -32,6 +32,28 @@ GPIO: event z tablicą + sub_label → impuls na GPIO17 (port 8090: /api/status,
 Uwaga: `docs/static/frigate-api.yaml` wymaga regeneracji (`python3 generate_api_auth_spec.py`)
 w pełnym środowisku dev — w kontenerze beta1 wynik byłby niekompletny.
 
+### Rozpoznawanie twarzy (2026-07-26)
+
+To natywna funkcja Frigate (nie coś dodanego przez fork, zob.
+`docs/docs/configuration/face_recognition.md`), zostaje tylko włączona na rpi5AI:
+
+```yaml
+face_recognition:
+  enabled: true
+  model_size: small # embeddingi liczą się na CPU hosta przez ONNX, nie na Hailo NPU
+```
+
+Wymaga śledzenia `person` na danej kamerze (`objects.track: [person, ...]`): Frigate
+musi najpierw wykryć osobę, zanim spróbuje wykryć i rozpoznać jej twarz. Po włączeniu
+(wymaga restartu Frigate) dostroić na realnym materiale z kamer: `recognition_threshold`
+(domyślnie 0.9, za wysoki próg daje same "Unknown", za niski daje fałszywe dopasowania)
+oraz `min_area` (minimalny rozmiar twarzy w pikselach, zależny od rozdzielczości strumienia
+`detect`). Trening przez zakładkę **Face Library** w UI: kreator **Add Face** na start
+(kilka wyraźnych, frontalnych zdjęć na osobę), potem douczanie z zakładki **Train** na
+podstawie tego, co Frigate faktycznie widzi na kamerach, zamiast masowego importu zdjęć.
+Podobnie jak wcześniejsza migracja OCR LPR na Hailo NPU (`lpr.device: Hailo`), przeniesienie
+embeddingów rozpoznawania twarzy z CPU hosta na NPU to możliwe zadanie na przyszłość.
+
 ---
 
 Reszta dokumentu: ogólny przewodnik. Stan researchu na 2026-07-14. Frigate oficjalnie NIE wspiera Hailo-10H (najwcześniej 0.19,

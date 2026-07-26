@@ -98,6 +98,7 @@ const sidebars: SidebarsConfig = {
           "configuration/object_filters",
           "configuration/masks",
           "configuration/zones",
+          "configuration/counting_lines",
           "configuration/objects",
           "configuration/stationary_objects",
         ],
