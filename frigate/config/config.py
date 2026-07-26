@@ -311,6 +311,16 @@ def verify_zone_objects_are_tracked(camera_config: CameraConfig) -> None:
                 )
 
 
+def verify_counting_line_objects_are_tracked(camera_config: CameraConfig) -> None:
+    """Verify that user has not entered counting line objects that are not in the tracking config."""
+    for line_name, line in camera_config.counting_lines.items():
+        for obj in line.objects:
+            if obj not in camera_config.objects.track:
+                raise ValueError(
+                    f"Counting line {line_name} is configured to track {obj} but that object type is not added to objects -> track."
+                )
+
+
 def verify_required_zones_exist(camera_config: CameraConfig) -> None:
     for det_zone in camera_config.review.detections.required_zones:
         if det_zone not in camera_config.zones.keys():
@@ -1005,6 +1015,7 @@ class FrigateConfig(FrigateBaseModel):
             verify_valid_live_stream_names(self, camera_config)
             verify_recording_segments_setup_with_reasonable_time(camera_config)
             verify_zone_objects_are_tracked(camera_config)
+            verify_counting_line_objects_are_tracked(camera_config)
             verify_required_zones_exist(camera_config)
             verify_profile_overrides_match_base(camera_config)
             verify_autotrack_zones(camera_config)

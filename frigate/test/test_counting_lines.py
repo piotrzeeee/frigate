@@ -67,6 +67,14 @@ class TestCountingLineConfig(unittest.TestCase):
         line = frigate_config.cameras["back"].counting_lines["entrance"]
         assert line.objects == ["person"]
 
+    def test_line_rejects_untracked_objects(self):
+        config = deepcopy(self.minimal)
+        config["cameras"]["back"]["counting_lines"] = {
+            "entrance": {"coordinates": "0.5,0.0,0.5,1.0", "objects": ["dog"]}
+        }
+        with self.assertRaises((ValidationError, ValueError)):
+            FrigateConfig(**config)
+
 
 class TestCrossingGeometry(unittest.TestCase):
     # vertical line from (100, 0) down to (100, 200)
