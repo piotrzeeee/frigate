@@ -1,4 +1,8 @@
-export type PolygonType = "zone" | "motion_mask" | "object_mask";
+export type PolygonType =
+  | "zone"
+  | "motion_mask"
+  | "object_mask"
+  | "counting_line";
 
 export type Polygon = {
   typeIndex: number;
@@ -15,6 +19,7 @@ export type Polygon = {
   enabled?: boolean;
   enabled_in_config?: boolean;
   polygonSource?: "base" | "profile" | "override";
+  reverse?: boolean;
 };
 
 export type ZoneFormValuesType = {
@@ -46,4 +51,13 @@ export type ObjectMaskFormValuesType = {
   enabled: boolean;
   objects: string;
   isFinished: boolean;
+};
+
+export type CountingLineFormValuesType = {
+  name: string;
+  friendly_name: string;
+  enabled: boolean;
+  reverse: boolean;
+  isFinished: boolean;
+  hasTwoPoints: boolean;
 };

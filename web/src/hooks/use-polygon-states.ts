@@ -17,7 +17,12 @@ export function usePolygonStates(polygons: Polygon[]) {
           ? `${polygon.camera}/zone/${polygon.name}/state`
           : polygon.type === "motion_mask"
             ? `${polygon.camera}/motion_mask/${polygon.name}/state`
-            : `${polygon.camera}/object_mask/${polygon.name}/state`;
+            : polygon.type === "object_mask"
+              ? `${polygon.camera}/object_mask/${polygon.name}/state`
+              : // Counting lines have no live toggle (edits require a
+                // restart), so this topic is never published; the state
+                // below always falls back to polygon.enabled.
+                `${polygon.camera}/counting_line/${polygon.name}/state`;
       set.add(topic);
     });
     return Array.from(set).sort();
@@ -71,7 +76,9 @@ export function usePolygonStates(polygons: Polygon[]) {
           ? `${polygon.camera}/zone/${polygon.name}/state`
           : polygon.type === "motion_mask"
             ? `${polygon.camera}/motion_mask/${polygon.name}/state`
-            : `${polygon.camera}/object_mask/${polygon.name}/state`;
+            : polygon.type === "object_mask"
+              ? `${polygon.camera}/object_mask/${polygon.name}/state`
+              : `${polygon.camera}/counting_line/${polygon.name}/state`;
 
       const wsValue = valueMap.get(topic);
       const enabled =

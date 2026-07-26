@@ -739,7 +739,8 @@
         "type": {
           "zone": "zone",
           "motion_mask": "motion mask",
-          "object_mask": "object mask"
+          "object_mask": "object mask",
+          "counting_line": "counting line"
         },
         "removeLastPoint": "Remove last point",
         "reset": {
@@ -878,6 +879,38 @@
         "success": {
           "title": "{{polygonName}} has been saved.",
           "noName": "Object Mask has been saved."
+        }
+      }
+    },
+    "countingLines": {
+      "label": "Counting Lines",
+      "documentTitle": "Edit Counting Line - Frigate",
+      "desc": {
+        "title": "Counting lines count objects that cross them, with an in and an out direction."
+      },
+      "add": "Add Counting Line",
+      "edit": "Edit Counting Line",
+      "defaultName": "Counting Line {{number}}",
+      "point_one": "{{count}} point",
+      "point_other": "{{count}} points",
+      "clickDrawLine": "Click to place the two endpoints of the counting line.",
+      "name": {
+        "title": "Name",
+        "description": "An optional friendly name for this counting line.",
+        "placeholder": "Enter a name..."
+      },
+      "reverse": "Reverse direction",
+      "reverseDesc": "Swap which side counts as in and which counts as out.",
+      "restartRequired": "Restart Frigate to apply counting line changes.",
+      "toggleViaEdit": "Edit the counting line to change its enabled state",
+      "form": {
+        "error": {
+          "mustHaveTwoPoints": "A counting line must have exactly 2 points."
+        }
+      },
+      "toast": {
+        "success": {
+          "title": "{{polygonName}} has been saved."
         }
       }
     },

@@ -15,7 +15,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
-import { LuCopy, LuPencil } from "react-icons/lu";
+import { LuArrowLeftRight, LuCopy, LuPencil } from "react-icons/lu";
 import { FaDrawPolygon, FaObjectGroup } from "react-icons/fa";
 import { BsPersonBoundingBox } from "react-icons/bs";
 import { HiOutlineDotsVertical, HiTrash } from "react-icons/hi";
@@ -87,7 +87,9 @@ export default function PolygonItem({
         ? zoneState
         : polygon.type === "motion_mask"
           ? motionMaskState
-          : objectMaskState;
+          : polygon.type === "object_mask"
+            ? objectMaskState
+            : undefined; // counting lines have no live WS toggle
     const wsEnabled =
       wsState === "ON" ? true : wsState === "OFF" ? false : undefined;
     return wsEnabled ?? polygon.enabled ?? true;
@@ -109,6 +111,7 @@ export default function PolygonItem({
     zone: FaDrawPolygon,
     motion_mask: FaObjectGroup,
     object_mask: BsPersonBoundingBox,
+    counting_line: LuArrowLeftRight,
   };
 
   const PolygonItemIcon = polygon ? polygonTypeIcons[polygon.type] : undefined;
@@ -203,6 +206,52 @@ export default function PolygonItem({
                 t("masksAndZones.form.polygonDrawing.delete.success", {
                   name: polygon?.friendly_name ?? polygon?.name,
                 }),
+                { position: "top-center" },
+              );
+              updateConfig();
+              onDeleted?.();
+            } else {
+              toast.error(
+                t("toast.save.error.title", {
+                  ns: "common",
+                  errorMessage: res.statusText,
+                }),
+                { position: "top-center" },
+              );
+            }
+          })
+          .catch((error) => {
+            const errorMessage =
+              error.response?.data?.message ||
+              error.response?.data?.detail ||
+              "Unknown error";
+            toast.error(
+              t("toast.save.error.title", { errorMessage, ns: "common" }),
+              { position: "top-center" },
+            );
+          })
+          .finally(() => {
+            setIsLoading(false);
+          });
+        return;
+      }
+
+      if (polygon.type === "counting_line") {
+        // Counting lines have no profile support and are read once at
+        // startup, so deletion always targets the base config and
+        // always requires a restart. There is no valid update_topic
+        // for this type, so it is intentionally omitted.
+        await axios
+          .put(
+            `config/set?cameras.${polygon.camera}.counting_lines.${polygon.name}`,
+            { requires_restart: 1 },
+          )
+          .then((res) => {
+            if (res.status === 200) {
+              toast.success(
+                `${t("masksAndZones.form.polygonDrawing.delete.success", {
+                  name: polygon?.friendly_name ?? polygon?.name,
+                })} ${t("masksAndZones.countingLines.restartRequired")}`,
                 { position: "top-center" },
               );
               updateConfig();
@@ -427,7 +476,8 @@ export default function PolygonItem({
                       isLoading ||
                       polygon.enabled_in_config === false ||
                       isBasePolygon ||
-                      !!editingProfile
+                      !!editingProfile ||
+                      polygon.type === "counting_line"
                     }
                     className="mr-2 shrink-0 cursor-pointer border-none bg-transparent p-0 transition-opacity hover:opacity-70 disabled:cursor-not-allowed disabled:opacity-50"
                   >
@@ -448,9 +498,11 @@ export default function PolygonItem({
                     ? t("masksAndZones.disabledInConfig", {
                         ns: "views/settings",
                       })
-                    : isPolygonEnabled
-                      ? t("button.disable", { ns: "common" })
-                      : t("button.enable", { ns: "common" })}
+                    : polygon.type === "counting_line"
+                      ? t("masksAndZones.countingLines.toggleViaEdit")
+                      : isPolygonEnabled
+                        ? t("button.disable", { ns: "common" })
+                        : t("button.enable", { ns: "common" })}
                 </TooltipContent>
               </Tooltip>
             ))}

@@ -16,9 +16,11 @@ import {
 import type { KonvaEventObject } from "konva/lib/Node";
 import Konva from "konva";
 import { Vector2d } from "konva/lib/types";
+import { PolygonType } from "@/types/canvas";
 
 type PolygonDrawerProps = {
   stageRef: RefObject<Konva.Stage | null>;
+  type?: PolygonType;
   points: number[][];
   distances: number[];
   isActive: boolean;
@@ -35,6 +37,7 @@ type PolygonDrawerProps = {
 
 export default function PolygonDrawer({
   stageRef,
+  type,
   points,
   distances,
   isActive,
@@ -48,6 +51,10 @@ export default function PolygonDrawer({
   snapToLines,
   snapPoints,
 }: PolygonDrawerProps) {
+  // Counting lines are a 2-point line, not an area: closing the path and
+  // filling it would draw a degenerate (zero-area) polygon, and the
+  // closed edge would double as a hit-region for adding a 3rd point.
+  const isLine = type === "counting_line";
   const vertexRadius = 6;
   const flattenedPoints = useMemo(() => flattenPoints(points), [points]);
   const [minMaxX, setMinMaxX] = useState([0, 0]);
@@ -172,8 +179,10 @@ export default function PolygonDrawer({
         strokeWidth={3}
         dash={enabled ? undefined : [10, 5]}
         hitStrokeWidth={12}
-        closed={isFinished}
-        fill={colorString(isActive || isHovered ? true : false)}
+        closed={isFinished && !isLine}
+        fill={
+          isLine ? undefined : colorString(isActive || isHovered ? true : false)
+        }
         opacity={enabled ? 1 : 0.85}
         onMouseOver={() =>
           isActive
@@ -190,7 +199,7 @@ export default function PolygonDrawer({
             : setCursor("default")
         }
       />
-      {isFinished && isActive && (
+      {isFinished && isActive && !isLine && (
         <Line
           name="unfilled-line"
           points={flattenedPoints}

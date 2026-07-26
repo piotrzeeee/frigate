@@ -184,6 +184,10 @@ export function PolygonCanvas({
           ...activePolygon,
           points: updatedPoints,
           pointsOrder: updatedPointsOrder,
+          isFinished:
+            activePolygon.isFinished ||
+            (activePolygon.type == "counting_line" &&
+              updatedPoints.length == 2),
         };
         setPolygons(updatedPolygons);
       }
@@ -318,6 +322,7 @@ export function PolygonCanvas({
               <PolygonDrawer
                 stageRef={stageRef}
                 key={index}
+                type={polygon.type}
                 points={polygon.points}
                 distances={polygon.distances}
                 isActive={index === activePolygonIndex}
@@ -348,6 +353,7 @@ export function PolygonCanvas({
             <PolygonDrawer
               stageRef={stageRef}
               key={activePolygonIndex}
+              type={polygons[activePolygonIndex].type}
               points={polygons[activePolygonIndex].points}
               distances={polygons[activePolygonIndex].distances}
               isActive={true}
