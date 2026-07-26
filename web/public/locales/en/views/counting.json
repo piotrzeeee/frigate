@@ -5,6 +5,7 @@
   "out": "Out",
   "balance": "Balance",
   "selectDay": "Select day",
+  "loadError": "Failed to load counting data.",
   "noLines": "No counting lines are configured. Draw lines in Settings under Masks / Zones.",
   "hourlyChart": "Crossings per hour"
 }

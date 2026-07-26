@@ -1,3 +1,4 @@
+import ActivityIndicator from "@/components/indicators/activity-indicator";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -54,7 +55,11 @@ export default function Counting() {
   const after = day.getTime() / 1000;
   const before = after + 86400;
 
-  const { data: summary } = useSWR<SummaryRow[]>(
+  const {
+    data: summary,
+    isLoading: summaryLoading,
+    error: summaryError,
+  } = useSWR<SummaryRow[]>(
     ["counting/summary", { after, before, bucket: "hour" }],
     { refreshInterval: 30000 },
   );
@@ -158,7 +163,15 @@ export default function Counting() {
       </div>
 
       <div className="scrollbar-container flex flex-1 flex-col gap-4 overflow-y-auto">
-        {lines.length === 0 ? (
+        {summaryLoading ? (
+          <div className="flex flex-1 items-center justify-center">
+            <ActivityIndicator />
+          </div>
+        ) : summaryError ? (
+          <div className="flex flex-1 items-center justify-center text-center text-danger">
+            {t("loadError")}
+          </div>
+        ) : lines.length === 0 ? (
           <div className="flex flex-1 items-center justify-center text-center text-muted-foreground">
             {t("noLines")}
           </div>
