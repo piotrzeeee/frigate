@@ -5,7 +5,12 @@ import { useMemo } from "react";
 import { isDesktop } from "react-device-detect";
 import { FaCompactDisc, FaVideo } from "react-icons/fa";
 import { IoSearch } from "react-icons/io5";
-import { LuCar, LuConstruction, LuShield } from "react-icons/lu";
+import {
+  LuArrowLeftRight,
+  LuCar,
+  LuConstruction,
+  LuShield,
+} from "react-icons/lu";
 import { MdCategory, MdChat, MdVideoLibrary } from "react-icons/md";
 import { TbFaceId } from "react-icons/tb";
 import useSWR from "swr";
@@ -21,6 +26,7 @@ export const ID_CLASSIFICATION = 7;
 export const ID_CHAT = 8;
 export const ID_PLATE_LIBRARY = 9;
 export const ID_ALARM = 10;
+export const ID_COUNTING = 11;
 
 export default function useNavigation(
   variant: "primary" | "secondary" = "primary",
@@ -36,6 +42,14 @@ export default function useNavigation(
         agent?.roles?.includes("chat"),
       ),
     [config?.genai],
+  );
+
+  const hasCountingLines = useMemo(
+    () =>
+      Object.values(config?.cameras ?? {}).some(
+        (camera) => Object.keys(camera.counting_lines ?? {}).length > 0,
+      ),
+    [config?.cameras],
   );
 
   return useMemo(
@@ -102,6 +116,14 @@ export default function useNavigation(
           enabled: isDesktop && isAdmin,
         },
         {
+          id: ID_COUNTING,
+          variant,
+          icon: LuArrowLeftRight,
+          title: "menu.counting",
+          url: "/counting",
+          enabled: isDesktop && isAdmin && hasCountingLines,
+        },
+        {
           id: ID_CLASSIFICATION,
           variant,
           icon: MdCategory,
@@ -122,6 +144,7 @@ export default function useNavigation(
       config?.face_recognition?.enabled,
       config?.lpr?.enabled,
       hasChatAgent,
+      hasCountingLines,
       variant,
       isAdmin,
     ],

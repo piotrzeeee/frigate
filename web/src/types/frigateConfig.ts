@@ -313,6 +313,15 @@ export interface CameraConfig {
       friendly_name?: string;
     };
   };
+  counting_lines: {
+    [lineName: string]: {
+      friendly_name?: string;
+      enabled: boolean;
+      coordinates: string;
+      objects: string[];
+      reverse: boolean;
+    };
+  };
   profiles?: Record<string, CameraProfileConfig>;
   /** Pre-profile base section configs, present only when a profile is active */
   base_config?: Record<string, Record<string, unknown>>;

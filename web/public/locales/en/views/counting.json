@@ -1,0 +1,10 @@
+{
+  "documentTitle": "Counting - Frigate",
+  "title": "Counting",
+  "in": "In",
+  "out": "Out",
+  "balance": "Balance",
+  "selectDay": "Select day",
+  "noLines": "No counting lines are configured. Draw lines in Settings under Masks / Zones.",
+  "hourlyChart": "Crossings per hour"
+}
