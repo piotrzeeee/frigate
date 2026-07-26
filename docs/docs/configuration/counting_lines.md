@@ -21,6 +21,13 @@ A counting line is defined by two points. Walking along the line from the first 
 1. Navigate to <NavPath path="Settings > Camera configuration > Masks / Zones" /> and select the desired camera.
 2. Under the **Counting Lines** section, click the plus icon to add a new line.
 3. Click on the camera's latest image to place the two endpoints of the line.
+
+   :::tip
+
+   Crossings are detected using the bottom center of the object's bounding box (for a person, their feet). Draw the line across the path where feet actually pass. In close-up scenes feet often sit at the very bottom edge of the frame, so extend the line all the way to the frame edge; a line that stops short of the edge will miss objects passing beyond its endpoint.
+
+   :::
+
 4. Configure options such as **Friendly name**, **Enabled**, and **Reverse direction** in the line editor.
 5. Press **Save** when finished.
 
