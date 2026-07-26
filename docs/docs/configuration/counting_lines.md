@@ -50,7 +50,7 @@ cameras:
 | Field           | Description                                                                                                                                         |
 | --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------|
 | `coordinates`   | Two points that define the line as relative (0-1) coordinates in the form `x1,y1,x2,y2`.                                                             |
-| `objects`       | Object types (from the labelmap) counted when crossing this line. Defaults to `[person]`. This is only configurable via YAML, not the line editor.  |
+| `objects`       | Object types (from the labelmap) counted when crossing this line. Defaults to `[person]`. An empty list counts all objects. This is only configurable via YAML, not the line editor. |
 | `reverse`       | Swap the `in` and `out` directions of the line. Defaults to `false`.                                                                                 |
 | `friendly_name` | A user-friendly name shown in the Frigate UI. If not set, a formatted version of the line name is used.                                              |
 | `enabled`       | Enable or disable this counting line. Disabled lines are ignored at runtime. Defaults to `true`.                                                     |
@@ -68,7 +68,7 @@ The **Counting** tab in the Frigate UI shows daily in/out totals for each camera
 
 Recorded crossings are available through the HTTP API for use in external tools such as Grafana:
 
-- `GET /counting/summary`: aggregated `in`/`out` counts per camera and line, bucketed by hour or day in server local time. Accepts `cameras`, `lines`, `labels`, `after`, `before`, and `bucket` (`hour` or `day`) query parameters.
-- `GET /counting/crossings`: individual crossing events, newest first, with the same filtering parameters (except `bucket`).
+- `GET /counting/summary`: aggregated `in`/`out` counts per camera and line, bucketed by hour or day in server local time. Accepts `cameras`, `lines`, `labels`, `after`, `before`, and `bucket` (`hour` or `day`, default `hour`) query parameters. This endpoint does not use `limit`; all matching buckets are returned.
+- `GET /counting/crossings`: individual crossing events, newest first. Accepts `cameras`, `lines`, `labels`, `after`, `before`, and `limit` (default `100`) query parameters. Results are capped at `limit` rows, most recent first, so raise it if you need a longer history in one request.
 
 Both endpoints are camera-filtered: a request only returns data for cameras the authenticated user has access to. See the [HTTP API reference](/integrations/api/frigate-http-api) for the full list of parameters and response fields.
