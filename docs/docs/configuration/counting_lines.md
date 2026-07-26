@@ -62,7 +62,7 @@ As with editing through the UI, changes to `counting_lines` in the configuration
 
 ## Viewing Counts
 
-The **Counting** tab in the Frigate UI shows daily in/out totals for each camera and line, broken down by hour, for any authenticated user with access to that camera.
+The **Counting** tab in the Frigate UI shows daily in/out totals for each camera and line, broken down by hour. This tab is available to admin users.
 
 ## Counting Line API
 
