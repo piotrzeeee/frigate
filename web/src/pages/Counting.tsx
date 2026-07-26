@@ -9,11 +9,13 @@ import {
 import { useTheme } from "@/context/theme-provider";
 import { resolveCameraName } from "@/hooks/use-camera-friendly-name";
 import { FrigateConfig } from "@/types/frigateConfig";
+import { RECORDING_REVIEW_LINK_PARAM } from "@/utils/recordingReviewUrl";
 import { useEffect, useMemo, useState } from "react";
 import Chart from "react-apexcharts";
 import { useTranslation } from "react-i18next";
-import { LuCalendar } from "react-icons/lu";
+import { LuCalendar, LuChevronRight } from "react-icons/lu";
 import { MdCircle } from "react-icons/md";
+import { Link } from "react-router-dom";
 import useSWR from "swr";
 
 const COUNTING_COLORS = ["#5C7CFA", "#ED5CFA"];
@@ -30,14 +32,29 @@ type SummaryRow = {
   count_out: number;
 };
 
+type Crossing = {
+  id: number;
+  camera: string;
+  line: string;
+  label: string;
+  direction: "in" | "out";
+  timestamp: number;
+  event_id: string | null;
+};
+
 type LineEntry = {
   camera: string;
   line: string;
   friendlyName: string;
 };
 
+// open the recording a few seconds before the crossing so the
+// approach is visible
+const RECORDING_PREROLL_SECONDS = 5;
+const RECENT_CROSSINGS_LIMIT = 10;
+
 export default function Counting() {
-  const { t } = useTranslation(["views/counting"]);
+  const { t } = useTranslation(["views/counting", "objects"]);
   const { data: config } = useSWR<FrigateConfig>("config");
   const { theme, systemTheme } = useTheme();
 
@@ -63,6 +80,24 @@ export default function Counting() {
     ["counting/summary", { after, before, bucket: "hour" }],
     { refreshInterval: 30000 },
   );
+
+  const { data: crossings } = useSWR<Crossing[]>(
+    ["counting/crossings", { after, before, limit: 500 }],
+    { refreshInterval: 30000 },
+  );
+
+  const crossingsByLine = useMemo(() => {
+    const map = new Map<string, Crossing[]>();
+    (crossings ?? []).forEach((crossing) => {
+      const key = `${crossing.camera}|${crossing.line}`;
+      const list = map.get(key) ?? [];
+      if (list.length < RECENT_CROSSINGS_LIMIT) {
+        list.push(crossing);
+      }
+      map.set(key, list);
+    });
+    return map;
+  }, [crossings]);
 
   const lines = useMemo<LineEntry[]>(
     () =>
@@ -222,6 +257,55 @@ export default function Counting() {
                       { name: t("out"), data: hoursOut },
                     ]}
                   />
+                </div>
+
+                <div>
+                  <div className="mb-1 text-xs text-secondary-foreground">
+                    {t("recentCrossings")}
+                  </div>
+                  {(crossingsByLine.get(`${camera}|${line}`) ?? []).length ==
+                  0 ? (
+                    <div className="text-sm text-muted-foreground">
+                      {t("noCrossings")}
+                    </div>
+                  ) : (
+                    <div className="flex flex-col">
+                      {(crossingsByLine.get(`${camera}|${line}`) ?? []).map(
+                        (crossing) => (
+                          <Link
+                            key={crossing.id}
+                            to={`/review?${RECORDING_REVIEW_LINK_PARAM}=${camera}_${Math.floor(crossing.timestamp - RECORDING_PREROLL_SECONDS)}`}
+                            aria-label={t("openRecording")}
+                            className="flex items-center gap-3 rounded-md px-2 py-1.5 hover:bg-secondary"
+                          >
+                            <MdCircle
+                              className="size-2 shrink-0"
+                              style={{
+                                color:
+                                  crossing.direction == "in"
+                                    ? COUNTING_COLORS[0]
+                                    : COUNTING_COLORS[1],
+                              }}
+                            />
+                            <span className="w-20 text-sm text-primary">
+                              {new Date(
+                                crossing.timestamp * 1000,
+                              ).toLocaleTimeString()}
+                            </span>
+                            <span className="w-16 text-sm text-primary">
+                              {crossing.direction == "in"
+                                ? t("in")
+                                : t("out")}
+                            </span>
+                            <span className="flex-1 text-sm text-muted-foreground">
+                              {t(crossing.label, { ns: "objects" })}
+                            </span>
+                            <LuChevronRight className="size-4 shrink-0 text-muted-foreground" />
+                          </Link>
+                        ),
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
             );
