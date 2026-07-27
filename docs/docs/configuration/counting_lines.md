@@ -13,6 +13,8 @@ Counting lines let you count objects that cross a line you draw across the camer
 
 A counting line is defined by two points. Walking along the line from the first point to the second, objects that pass from your left to your right are counted as `in`; objects passing from your right to your left are counted as `out`. Set `reverse: true` to swap which side is `in` and which is `out`.
 
+An object is only assigned a side once it is more than 1.5% of the frame height away from the line. An object standing on the line has no conclusive side, so the small frame-to-frame movement of its bounding box does not register as repeated crossings; it is counted once it moves clearly past the line.
+
 ## Creating a Counting Line
 
 <ConfigTabs>
@@ -69,7 +71,9 @@ As with editing through the UI, changes to `counting_lines` in the configuration
 
 ## Viewing Counts
 
-The **Counting** tab in the Frigate UI shows daily in/out totals for each camera and line, broken down by hour. This tab is available to admin users.
+The **Counting** tab in the Frigate UI shows in/out totals for each camera and line over the selected period: today, the last 7 days, the last 30 days, or a single day picked from the calendar. Single-day periods are charted per hour, longer periods per day.
+
+Below the totals, the crossing log lists every crossing in the period, newest first, with a thumbnail of the object (hover to play a short preview). Selecting a crossing opens the recording five seconds before it happened. Use **Load more** to page further back. This tab is available to admin users.
 
 ## Counting Line API
 

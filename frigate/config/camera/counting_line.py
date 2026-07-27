@@ -1,6 +1,7 @@
 """Counting line configuration."""
 
 import logging
+import math
 
 from pydantic import Field, PrivateAttr, field_validator
 
@@ -9,6 +10,12 @@ from ..base import FrigateBaseModel
 __all__ = ["CountingLineConfig"]
 
 logger = logging.getLogger(__name__)
+
+# An anchor closer to the line than this fraction of the frame height is
+# treated as still being on the line. Detection boxes jitter by a few pixels
+# every frame, so without this dead band an object standing on the line
+# registers a burst of crossings.
+HYSTERESIS_RATIO = 0.015
 
 
 class CountingLineConfig(FrigateBaseModel):
@@ -39,6 +46,7 @@ class CountingLineConfig(FrigateBaseModel):
 
     _start: tuple[int, int] = PrivateAttr(default=(0, 0))
     _end: tuple[int, int] = PrivateAttr(default=(0, 0))
+    _hysteresis: float = PrivateAttr(default=0.0)
 
     @property
     def start(self) -> tuple[int, int]:
@@ -47,6 +55,11 @@ class CountingLineConfig(FrigateBaseModel):
     @property
     def end(self) -> tuple[int, int]:
         return self._end
+
+    @property
+    def hysteresis(self) -> float:
+        """Cross product magnitude below which an anchor counts as on the line."""
+        return self._hysteresis
 
     def get_formatted_name(self, line_name: str) -> str:
         """Return the friendly name if set, otherwise a formatted version of the line name."""
@@ -91,3 +104,10 @@ class CountingLineConfig(FrigateBaseModel):
             int(values[2] * frame_shape[1]),
             int(values[3] * frame_shape[0]),
         )
+
+        # line_side returns the cross product, which scales with the line
+        # length, so scale the dead band the same way to compare directly
+        length = math.hypot(
+            self._end[0] - self._start[0], self._end[1] - self._start[1]
+        )
+        self._hysteresis = length * frame_shape[0] * HYSTERESIS_RATIO

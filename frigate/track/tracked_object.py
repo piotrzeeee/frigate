@@ -63,6 +63,7 @@ class TrackedObject:
         self.entered_zones: list[str] = []
         self.new_zone_entered: bool = False
         self.line_sides: dict[str, float] = {}
+        self.line_anchors: dict[str, tuple[float, float]] = {}
         self.pending_line_crossings: list[dict[str, Any]] = []
         self.attributes: dict[str, float] = defaultdict(float)
         self.false_positive = True
@@ -302,10 +303,8 @@ class TrackedObject:
         # update loitering status
         self.pending_loitering = in_loitering_zone
 
-        # check counting lines; self.obj_data still holds the previous
-        # frame here, so it provides the previous anchor position
+        # check counting lines
         if self.camera_config.counting_lines and not self.false_positive:
-            prev_anchor = (self.obj_data["centroid"][0], self.obj_data["box"][3])
             for name, line in self.camera_config.counting_lines.items():
                 if not line.enabled:
                     continue
@@ -313,15 +312,27 @@ class TrackedObject:
                     continue
 
                 side = line_side(line.start, line.end, bottom_center)
+
+                # an anchor sitting on the line has no conclusive side yet, so
+                # ignore it entirely; comparing against the last position that
+                # was clearly on one side keeps jitter from counting repeatedly
+                if abs(side) < line.hysteresis:
+                    continue
+
                 prev_side = self.line_sides.get(name, 0)
-                direction = check_line_crossing(
-                    prev_side,
-                    side,
-                    prev_anchor,
-                    bottom_center,
-                    line.start,
-                    line.end,
-                    line.reverse,
+                prev_anchor = self.line_anchors.get(name)
+                direction = (
+                    check_line_crossing(
+                        prev_side,
+                        side,
+                        prev_anchor,
+                        bottom_center,
+                        line.start,
+                        line.end,
+                        line.reverse,
+                    )
+                    if prev_anchor is not None
+                    else None
                 )
 
                 if direction is not None:
@@ -345,8 +356,8 @@ class TrackedObject:
                         direction,
                     )
 
-                if side != 0:
-                    self.line_sides[name] = side
+                self.line_sides[name] = side
+                self.line_anchors[name] = bottom_center
 
         # maintain attributes
         for attr in obj_data["attributes"]:

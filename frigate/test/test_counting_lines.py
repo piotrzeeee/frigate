@@ -42,6 +42,19 @@ class TestCountingLineConfig(unittest.TestCase):
         assert line.reverse is False
         assert line.enabled is True
 
+    def test_hysteresis_covers_a_band_around_the_line(self):
+        config = deepcopy(self.minimal)
+        config["cameras"]["back"]["counting_lines"] = {
+            "entrance": {"coordinates": "0.5,0.0,0.5,1.0"}
+        }
+        frigate_config = FrigateConfig(**config)
+        line = frigate_config.cameras["back"].counting_lines["entrance"]
+
+        # 1.5% of a 1080 tall frame, so anchors within ~16px of the line
+        # are inconclusive while anything past that counts
+        assert abs(line_side(line.start, line.end, (945, 500))) < line.hysteresis
+        assert abs(line_side(line.start, line.end, (930, 500))) > line.hysteresis
+
     def test_line_rejects_wrong_point_count(self):
         config = deepcopy(self.minimal)
         config["cameras"]["back"]["counting_lines"] = {
