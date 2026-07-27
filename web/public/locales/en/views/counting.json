@@ -5,11 +5,21 @@
   "out": "Out",
   "balance": "Balance",
   "selectDay": "Select day",
+  "range": {
+    "today": "Today",
+    "week": "7 days",
+    "month": "30 days",
+    "day": "Pick a day"
+  },
   "loadError": "Failed to load counting data.",
   "noLines": "No counting lines are configured. Draw lines in Settings under Masks / Zones.",
   "hourlyChart": "Crossings per hour",
-  "recentCrossings": "Recent crossings",
-  "noCrossings": "No crossings on this day.",
+  "dailyChart": "Crossings per day",
+  "log": "Crossing log",
+  "logCount_one": "{{count}} crossing",
+  "logCount_other": "{{count}} crossings",
+  "loadMore": "Load more",
+  "noCrossings": "No crossings in this period.",
   "openRecording": "Open recording",
   "directionIn": "In",
   "directionOut": "Out"
