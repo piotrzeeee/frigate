@@ -13,7 +13,7 @@ Counting lines let you count objects that cross a line you draw across the camer
 
 A counting line is defined by two points. Walking along the line from the first point to the second, objects that pass from your left to your right are counted as `in`; objects passing from your right to your left are counted as `out`. Set `reverse: true` to swap which side is `in` and which is `out`.
 
-An object is only assigned a side once it is more than 1.5% of the frame height away from the line. An object standing on the line has no conclusive side, so the small frame-to-frame movement of its bounding box does not register as repeated crossings; it is counted once it moves clearly past the line.
+An object is only assigned a side once it is clearly away from the line, by roughly 15% of its own bounding box width. An object standing on the line has no conclusive side, so the small frame-to-frame movement of its bounding box does not register as repeated crossings; it is counted once it moves past the line.
 
 ## Creating a Counting Line
 

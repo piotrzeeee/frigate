@@ -37,6 +37,11 @@ logger = logging.getLogger(__name__)
 # even if they are stationary.
 EXTENDED_LOITERING_OBJECTS = ["person"]
 
+# Fraction of an object's box width that its position can drift between frames
+# without meaning it actually moved. Used to keep an object resting on a
+# counting line from registering a burst of crossings.
+BOX_JITTER_RATIO = 0.15
+
 
 class TrackedObject:
     def __init__(
@@ -315,8 +320,15 @@ class TrackedObject:
 
                 # an anchor sitting on the line has no conclusive side yet, so
                 # ignore it entirely; comparing against the last position that
-                # was clearly on one side keeps jitter from counting repeatedly
-                if abs(side) < line.hysteresis:
+                # was clearly on one side keeps jitter from counting repeatedly.
+                # box jitter grows with how large the object appears, so the
+                # dead band is scaled by the box rather than being fixed
+                dead_band = max(
+                    line.min_dead_band,
+                    (obj_data["box"][2] - obj_data["box"][0]) * BOX_JITTER_RATIO,
+                )
+
+                if abs(side) / line.length < dead_band:
                     continue
 
                 prev_side = self.line_sides.get(name, 0)

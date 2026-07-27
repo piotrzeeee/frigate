@@ -11,11 +11,10 @@ __all__ = ["CountingLineConfig"]
 
 logger = logging.getLogger(__name__)
 
-# An anchor closer to the line than this fraction of the frame height is
-# treated as still being on the line. Detection boxes jitter by a few pixels
-# every frame, so without this dead band an object standing on the line
-# registers a burst of crossings.
-HYSTERESIS_RATIO = 0.015
+# Smallest dead band around a line, as a fraction of the frame height. Object
+# sized dead bands take over from here (see TrackedObject.update), this only
+# keeps tiny distant objects from flickering across the line.
+MIN_DEAD_BAND_RATIO = 0.01
 
 
 class CountingLineConfig(FrigateBaseModel):
@@ -46,7 +45,8 @@ class CountingLineConfig(FrigateBaseModel):
 
     _start: tuple[int, int] = PrivateAttr(default=(0, 0))
     _end: tuple[int, int] = PrivateAttr(default=(0, 0))
-    _hysteresis: float = PrivateAttr(default=0.0)
+    _length: float = PrivateAttr(default=0.0)
+    _min_dead_band: float = PrivateAttr(default=0.0)
 
     @property
     def start(self) -> tuple[int, int]:
@@ -57,9 +57,14 @@ class CountingLineConfig(FrigateBaseModel):
         return self._end
 
     @property
-    def hysteresis(self) -> float:
-        """Cross product magnitude below which an anchor counts as on the line."""
-        return self._hysteresis
+    def length(self) -> float:
+        """Length of the line in pixels."""
+        return self._length
+
+    @property
+    def min_dead_band(self) -> float:
+        """Smallest distance in pixels an object must clear to pick a side."""
+        return self._min_dead_band
 
     def get_formatted_name(self, line_name: str) -> str:
         """Return the friendly name if set, otherwise a formatted version of the line name."""
@@ -105,9 +110,7 @@ class CountingLineConfig(FrigateBaseModel):
             int(values[3] * frame_shape[0]),
         )
 
-        # line_side returns the cross product, which scales with the line
-        # length, so scale the dead band the same way to compare directly
-        length = math.hypot(
+        self._length = math.hypot(
             self._end[0] - self._start[0], self._end[1] - self._start[1]
         )
-        self._hysteresis = length * frame_shape[0] * HYSTERESIS_RATIO
+        self._min_dead_band = frame_shape[0] * MIN_DEAD_BAND_RATIO
